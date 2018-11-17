@@ -1,69 +1,78 @@
 <?php
+class ProductsFeed {
+  public $xml;
 
-class Main
-{
-    private $_data;
+  private $store_id;
+  private $base_uri;
+  private $api_host;
 
-    public function __construct()
-    {
+  function __construct ($store_id, $base_uri, $api_host = 'https://api.e-com.plus/v1') {
+    // setup store info
+    $this->store_id = $store_id;
+    $this->base_uri = $base_uri;
+    $this->api_host = $api_host;
+  }
+
+  private function api_request ($method, $endpoint, $data) {
+    // send request to E-Com Plus Store API
+    $curl = curl_init();
+
+    if ($method === 'GET') {
+      if ($data) {
+        // parse data to query string
+        $endpoint = $endpoint + '?' + http_build_query($data);
+      }
+    } else {
+      if ($method === 'POST') {
+        curl_setopt($curl, CURLOPT_POST, 1);
+      } else {
+        // PUT, PATCH, DELETE
+        curl_setopt($curl, CURLOPT_CUSTOMREQUEST, $method);
+      }
+      if ($data) {
+        curl_setopt($curl, CURLOPT_POSTFIELDS, $data);
+      }
     }
 
-    public function request($method, $url, $data, $headers)
-    {
-        $curl = curl_init();
-     
-        switch ($method) {
-           case "POST":
-              curl_setopt($curl, CURLOPT_POST, 1);
-              if ($data) {
-                  curl_setopt($curl, CURLOPT_POSTFIELDS, $data);
-              }
-              break;
-           case "PUT":
-              curl_setopt($curl, CURLOPT_CUSTOMREQUEST, "PUT");
-              if ($data) {
-                  curl_setopt($curl, CURLOPT_POSTFIELDS, $data);
-              }
-              break;
-           default:
-              if ($data) {
-                  $url = sprintf("%s?%s", $url, http_build_query($data));
-              }
-        }
-     
-        curl_setopt($curl, CURLOPT_URL, $url);
-        curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
-        curl_setopt($curl, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
-        
-        if ($headers) {
-            curl_setopt($curl, CURLOPT_HTTPHEADER, array(
-               'X-Store-ID: 100',
-               'Content-Type: application/json',
-            ));
-        }
+    curl_setopt($curl, CURLOPT_URL, $this->api_host . $endpoint);
+    curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
+    curl_setopt($curl, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
+    curl_setopt($curl, CURLOPT_HTTPHEADER, array(
+      'X-Store-ID: ' . $this->store_id,
+      'Content-Type: application/json',
+    ));
 
-        $result = curl_exec($curl);
-        if (!$result) {
-            die("Connection Failure");
-        }
-        curl_close($curl);
-        return $result;
+    $result = curl_exec($curl);
+    if (!$result) {
+      // @TODO
+      exit('Connection Failure');
     }
+    curl_close($curl);
+    return $result;
+  }
 
-    public function convert()
-    {
-        $product = json_decode('{"_id":"123a5432109876543210cdef","created_at":"2017-12-01T01:00:30.612Z","store_id":100,"sku":"s-MP_2B4","commodity_type":"physical","name":"Mens Pique Polo Shirt","slug":"mens-pique-polo-shirt","available":true,"visible":true,"ad_relevance":0,"short_description":"Red, 100% cotton, large men’s t-shirt","body_html":"<p>Red, 100% cotton, large men’s t-shirt.</p><p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.</p>","body_text":"Red, 100% cotton, large men’s t-shirt.\nLorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.","meta_title":"Mens Pique Polo Shirt - My Shirt Shop","meta_description":"Mens Pique Polo Shirt, Red, 100% cotton, large men’s t-shirt","keywords":["tshirt","t-shirt","man"],"price":42.9,"price_effective_date":{"end":"2018-12-01T10:00:00.612Z"},"base_price":60,"currency_id":"BRL","currency_symbol":"R$","quantity":100,"manage_stock":true,"dimensions":{"width":{"value":10,"unit":"cm"},"height":{"value":8,"unit":"cm"},"length":{"value":8,"unit":"cm"}},"weight":{"value":400,"unit":"g"},"condition":"new","adult":false,"brands":[{"_id":"a10000000000000000000001","name":"Shirts Example","slug":"shirts-example","logo":{"url":"https://mycdn.com/shirts-example.jpg","size":"100x50"}}],"categories":[{"_id":"f10000000000000000000001","name":"Polo Shirts","slug":"polo"}],"specifications":{"age_group":[{"text":"Adult","value":"adult"}],"gender":[{"text":"Male","value":"male"}],"size":[{"text":"Large","value":"large"}],"size_type":[{"text":"Regular","value":"regular"}],"size_system":[{"text":"BR","value":"BR"}],"material":[{"text":"Cotton","value":"cotton"}],"colors":[{"text":"Pique","value":"#ff5b00"}]},"auto_fill_related_products":true,"gtin":["12345678901234"],"mpn":["T1230"]}');
-        $dominio = $_SERVER['HTTP_HOST'];
-        $queryString = '';
-        $promotion_id = '';
+  function xml ($title = 'Products feed', $promotion_id, $product_ids) {
+    $entries = [];
 
-        $xml = '<?xml version="1.0"?>
+    return <<<XML
+<?xml version="1.0"?>
+<feed xmlns="http://www.w3.org/2005/Atom" xmlns:g="http://base.google.com/ns/1.0">
+  <title><![CDATA[$title]]></title>
+  <link rel="self" href="this->$base_uri"/>
+  <updated>{date('Y-m-d\TH:i:s\Z')}</updated>
+  $entries
+</feed>
+XML;
+  }
+
+  public function convert ($product, $domain, $query_string, $product_id) {
+    $xml = '<?xml version="1.0"?>
             <feed xmlns="http://www.w3.org/2005/Atom" xmlns:g="http://base.google.com/ns/1.0">
             <title>Example - Online Store</title>
             <link rel="self" href="http://www.example.com"/>
-            <updated>20011-07-11T12:00:00Z</updated> 
+            <updated>20011-07-11T12:00:00Z</updated>
             <entry>';
-        
+
         if (isset($product->_id)) {
             $xml .= '<g:id>' . $product->_id . '<g:id>';
         }
@@ -101,7 +110,7 @@ class Main
         }
 
         //$xml .= '<g:cost_of_goods_sold>' . . '<g:cost_of_goods_sold>'; // optional
-            
+
         if (isset($product->measurement)) {
             $xml .= '<g:unit_pricing_measure>' . $product->measurement->unit . '<g:unit_pricing_measure>';
             $xml .= '<g:unit_pricing_base_measure>' . $product->measurement->pricing_base_measure  . '<g:unit_pricing_base_measure>';
@@ -124,9 +133,9 @@ class Main
         if (isset($product->mpn)) {
             $xml .= '<g:mpn>' .$product->mpn[0] . '<g:mpn>';
         }
-            
+
         $xml .= '<g:identifier_exists>' . !isset($product->brands[0]->name) && !isset($product->gtin[0]) && isset($product->mpn[0]) ? 'no' : 'yes' . '<g:identifier_exists>';
-            
+
         if (isset($product->condition)) {
             $xml .= '<g:condition>' . $product->condition . '<g:condition>';
         }
@@ -136,15 +145,15 @@ class Main
         if (isset($product->multipack)) {
             $xml .= '<g:multipack>' . $product->multipack . '<g:multipack>';
         }
-            
+
         $xml .= '<g:is_bundle>' . 'no' . '<g:is_bundle>';
-        
+
         if (isset($product->specifications->energy_efficiency_class)) {
             $xml .= '<g:energy_efficiency_class>' . $product->specifications->energy_efficiency_class->text . '<g:energy_efficiency_class>';  //optional
             $xml .= '<g:min_energy_efficiency_class>' . $product->specifications->energy_efficiency_class->value. '<g:min_energy_efficiency_class>'; //optional
             //$xml .= '<g:max_energy_efficiency_class>' . . '<g:max_energy_efficiency_class>'; //optional
         }
-   
+
         if (isset($product->specifications)) {
             $xml .= '<g:age_group>' . $product->specifications->age_group[0]->text . '<g:age_group>';
             $xml .= '<g:color>' . $product->specifications->colors[0]->text . '<g:color>';
@@ -164,7 +173,7 @@ class Main
         if ($promotion_id) {
             $xml .= '<g:promotion_id>' . $promotion_id . '<g:promotion_id>'; //optional
         }
-        
+
         if (isset($product->destinations)) {
             $xml .= '<g:excluded_destination>' .$product->destinations->excluded->country . '<g:excluded_destination>'; // optional
             $xml .= '<g:included_destination>' . $product->destinations->included->country . '<g:included_destination>'; // optional
@@ -188,7 +197,7 @@ class Main
 
         //$xml .= '<g:tax>' . . '<g:tax>';
         //$xml .= '<g:tax_category>' . . '<g:tax_category>';
-        
+
         $xml .= '</entry>';
         $xml .= '</feed>';
 
@@ -196,17 +205,6 @@ class Main
         print_r($xml);
     }
 
-    // not implemented
-    public function getCategoriesParent($id)
-    {
-    }
-
-    // not implemented
-    public function setPromotionId(){
-
-    }
+  public function getCategoriesParent ($id) {
+  }
 }
-
-$t = new Main();
-print_r($t->convert());
-//print_r($t->request('GET', 'https://api.e-com.plus/v1/products/123a5432109876543210cdef.json', false, true));
