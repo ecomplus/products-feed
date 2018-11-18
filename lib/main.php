@@ -14,7 +14,7 @@ class ProductsFeed {
     $this->api_host = $api_host;
   }
 
-  private function api_request ($endpoint, $method = 'GET', $data) {
+  private function api_request ($endpoint, $method = 'GET', $data = null) {
     // send request to E-Com Plus Store API
     $curl = curl_init();
 
@@ -84,21 +84,28 @@ XML;
         // check if product is available
         if (@$product['available'] === true && @$product['visible'] === true) {
           // convert product to GMC XML entry
-          $xml += <<<XML
+          $xml .= <<<XML
   {$this->convert($product, $query_string, $set_properties)}
 XML;
         }
       }
     }
 
-    $xml += <<<XML
+    $xml .= <<<XML
 </feed>
 XML;
     return $xml;
   }
 
-  function convert ($body, $query_string = '?_=feed', $set_properties, $group_id) {
+  function convert ($body, $query_string, $set_properties, $group_id = null) {
     if (isset($body['name']) && isset($body['_id'])) {
+      // start converting product body to XML
+      // https://support.google.com/merchants/answer/7052112?hl=en
+      if ($query_string) {
+        // fix http query string
+        $query_string = '?_=feed';
+      }
+
       $entry = array(
         'id' => isset($body['sku']) ? $body['sku'] : $body['_id'],
         'title' => $body['name']
@@ -116,14 +123,14 @@ XML;
 
       // product page links
       if (isset($body['permalink'])) {
-        $entry['link'] = $body['permalink'] . $queryString;
+        $entry['link'] = $body['permalink'] . $query_string;
       } else if (isset($body['slug'])) {
-        $entry['link'] = $this->base_uri . $body['slug'] . $queryString;
+        $entry['link'] = $this->base_uri . $body['slug'] . $query_string;
       } else {
-        $entry['link'] = $this->base_uri . $queryString + '&_id=' . $body['_id'];
+        $entry['link'] = $this->base_uri . $query_string + '&_id=' . $body['_id'];
       }
       if (isset($body['mobile_link'])) {
-        $entry['mobile_link'] = $body['mobile_link'] . $queryString;
+        $entry['mobile_link'] = $body['mobile_link'] . $query_string;
       }
 
       // stock
@@ -314,7 +321,7 @@ XML;
       $xml .= '</entry>';
 
       // handle product variations recursively
-      if ($body['variations']) {
+      if (isset($body['variations'])) {
         foreach ($body['variations'] as $variation) {
           // use default values from product body
           $variation = array_merge($body, $variation);
