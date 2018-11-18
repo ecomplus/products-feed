@@ -78,7 +78,7 @@ XML;
     for ($i = 0; $i < count($product_ids); $i++) {
       // delay to prevent 503 error
       usleep($i * 300);
-      $json = $this->api_request('/products/' . $product_ids[$i] . '.json');
+      $json = $this->api_request('/products/' . (string)$product_ids[$i] . '.json');
       $product = json_decode($json, true);
       if (json_last_error() === JSON_ERROR_NONE) {
         // check if product is available
