@@ -253,41 +253,43 @@ XML;
       }
 
       // handling specs
-      $custom_label = 0;
-      foreach (@$body['specifications'] as $spec => $values) {
-        if (count($values) === 0) continue;
-        $value = $values[0];
+      if (isset($body['specifications'])) {
+        $custom_label = 0;
+        foreach ($body['specifications'] as $spec => $values) {
+          if (count($values) === 0) continue;
+          $value = $values[0];
 
-        switch ($spec) {
-          case 'energy_efficiency_class':
-          case 'age_group':
-          case 'gender':
-          case 'size_type':
-          case 'size_system':
-            $entry[$spec] = @$value['value'] ? $value['value'] : @$value['text'];
-            break;
+          switch ($spec) {
+            case 'energy_efficiency_class':
+            case 'age_group':
+            case 'gender':
+            case 'size_type':
+            case 'size_system':
+              $entry[$spec] = @$value['value'] ? $value['value'] : @$value['text'];
+              break;
 
-          case 'size':
-          case 'pattern':
-          case 'material':
-            $entry[$spec] = @$value['text'];
-            break;
+            case 'size':
+            case 'pattern':
+            case 'material':
+              $entry[$spec] = @$value['text'];
+              break;
 
-          case 'colors':
-            // send up to 3 colors
-            $colors = str_replace('/', ' ', @$value['text']);
-            for ($i = 1; $i < count($values); $i++) {
-              $colors .= '/' . str_replace('/', ' ', @$values[$i]['text']);
-            }
-            $entry[$spec] = $colors;
-            break;
+            case 'colors':
+              // send up to 3 colors
+              $colors = str_replace('/', ' ', @$value['text']);
+              for ($i = 1; $i < count($values); $i++) {
+                $colors .= '/' . str_replace('/', ' ', @$values[$i]['text']);
+              }
+              $entry[$spec] = $colors;
+              break;
 
-          default:
-            // send as custom label
-            if ($custom_label < 5) {
-              $entry['custom_label_' . $custom_label] = @$values[$i]['text'];
-            }
-            break;
+            default:
+              // send as custom label
+              if ($custom_label < 5) {
+                $entry['custom_label_' . $custom_label] = @$values[$i]['text'];
+              }
+              break;
+          }
         }
       }
 
@@ -303,7 +305,16 @@ XML;
       foreach ($entry as $key => $value) {
         $xml .= '<g:' . $key . '><![CDATA[' . $value . ']]></g:' . $key . '>';
       }
-      return $xml . '</entry>';
+      $xml .= '</entry>';
+
+      // handle product variations recursively
+      if ($body['variations']) {
+        foreach ($body['variations'] as $variation) {
+          $xml .= $this->convert($variation, $query_string, $set_properties, $entry['id']);
+        }
+      }
+
+      return $xml;
     } else {
       // no product data
       return '';
