@@ -316,6 +316,25 @@ XML;
       // handle product variations recursively
       if ($body['variations']) {
         foreach ($body['variations'] as $variation) {
+          // use default values from product body
+          $variation = array_merge($body, $variation);
+          unset($variation['variations']);
+
+          // get the variation specific picture
+          if (isset($variation['picture_id']) && isset($body['pictures'])) {
+            $img_obj = null;
+            for ($i = 0; $i < count($body['pictures']); $i++) {
+              if ($body['pictures'][$i]['_id'] === $variation['picture_id']) {
+                $img_obj = $body['pictures'][$i];
+                break;
+              }
+            }
+            if ($img_obj) {
+              // overwrite pictures array
+              $variation['pictures'] = array($img_obj);
+            }
+          }
+
           $xml .= $this->convert($variation, $query_string, $set_properties, $entry['id']);
         }
       }
