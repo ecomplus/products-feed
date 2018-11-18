@@ -103,6 +103,9 @@ XML;
         'id' => isset($body['sku']) ? $body['sku'] : $body['_id'],
         'title' => $body['name']
       );
+      if ($group_id) {
+        $entry['item_group_id'] = $group_id;
+      }
 
       // text description
       if (isset($body['body_text'])) {
@@ -206,8 +209,11 @@ XML;
       if (isset($body['google_product_category_id'])) {
         $entry['google_product_category'] = $body['google_product_category_id'];
       }
-      if (isset($body['categories'])) {
-        // @TODO
+      if (isset($body['category_tree']) && $body['category_tree'] !== '') {
+        $entry['product_type'] = $body['category_tree'];
+      } else if (isset($body['categories']) && count($body['categories']) > 0) {
+        // get frst category only
+        $entry['product_type'] = @$body['categories'][0]['name'];
       }
 
       // brand name
