@@ -3,7 +3,7 @@ require './lib/main.php';
 
 $products_feed = new ProductsFeed(
   @$_SERVER['HTTP_X_STORE_ID'],
-  'https://' . $_SERVER['HTTP_X_STORE_DOMAIN'] . '/'
+  'https://' . @$_SERVER['HTTP_X_STORE_DOMAIN'] . '/'
 );
 
 echo $products_feed->xml(
