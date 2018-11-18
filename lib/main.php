@@ -57,7 +57,7 @@ class ProductsFeed {
 <?xml version="1.0"?>
 <feed xmlns="http://www.w3.org/2005/Atom" xmlns:g="http://base.google.com/ns/1.0">
   <title><![CDATA[$title]]></title>
-  <link rel="self" href="{this->$base_uri}"/>
+  <link rel="self" href="{$this->base_uri}"/>
   <updated>{date('Y-m-d\TH:i:s\Z')}</updated>
 XML;
 
