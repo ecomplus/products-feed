@@ -21,7 +21,7 @@ class ProductsFeed {
     if ($method === 'GET') {
       if ($data) {
         // parse data to query string
-        $endpoint = $endpoint + '?' + http_build_query($data);
+        $endpoint = $endpoint . '?' . http_build_query($data);
       }
     } else {
       if ($method === 'POST') {
@@ -53,12 +53,13 @@ class ProductsFeed {
   }
 
   function xml ($title = 'Products feed', $query_string, $set_properties, $product_ids) {
+    $date = date('Y-m-d\TH:i:s\Z');
     $xml = <<<XML
 <?xml version="1.0"?>
 <feed xmlns="http://www.w3.org/2005/Atom" xmlns:g="http://base.google.com/ns/1.0">
   <title><![CDATA[$title]]></title>
   <link rel="self" href="{$this->base_uri}"/>
-  <updated>{date('Y-m-d\TH:i:s\Z')}</updated>
+  <updated>$date</updated>
 XML;
 
     if (!$product_ids) {
@@ -127,7 +128,7 @@ XML;
       } else if (isset($body['slug'])) {
         $entry['link'] = $this->base_uri . $body['slug'] . $query_string;
       } else {
-        $entry['link'] = $this->base_uri . $query_string + '&_id=' . $body['_id'];
+        $entry['link'] = $this->base_uri . $query_string . '&_id=' . $body['_id'];
       }
       if (isset($body['mobile_link'])) {
         $entry['mobile_link'] = $body['mobile_link'] . $query_string;
