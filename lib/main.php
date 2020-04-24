@@ -194,13 +194,13 @@ XML;
           $entry['sale_price'] = $body['price'] . ' ' . @$body['currency_id'];
 
           if (isset($body['price_effective_date'])) {
-            if (isset($body['price_effective_date']['start'])) {
+            if (@$body['price_effective_date']['start']) {
               $date_range = $body['price_effective_date']['start'];
             } else {
               $date_range = date('Y-m-d\TH:i:s\Z');
             }
-            if (isset($body['price_effective_date']['end'])) {
-              $date_range .= '/' . $body['price_effective_date']['start'];
+            if (@$body['price_effective_date']['end']) {
+              $date_range .= '/' . $body['price_effective_date']['end'];
             } else {
               // any future date
               $date_range .= '/' . date('Y-m-d\TH:i:s\Z', strtotime('+60 days'));
