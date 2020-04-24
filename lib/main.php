@@ -194,18 +194,22 @@ XML;
           $entry['sale_price'] = $body['price'] . ' ' . @$body['currency_id'];
 
           if (isset($body['price_effective_date'])) {
-            if (@$body['price_effective_date']['start']) {
-              $date_range = $body['price_effective_date']['start'];
-            } else {
-              $date_range = date('Y-m-d\TH:i:s\Z');
+            $sale_start = @$body['price_effective_date']['start'];
+            $sale_end = @$body['price_effective_date']['end'];
+            if ($sale_start || $sale_end) {
+              if (!$sale_start) {
+                $sale_start = date('Y-m-d\TH:i:s\Z');
+              }
+              if (!$sale_end) {
+                // any future date
+                $sale_end = date('Y-m-d\TH:i:s\Z', strtotime('+60 days'));
+              }
+              if ($sale_start > $sale_end) {
+                unset($entry['sale_price']);
+              } else {
+                $entry['sale_price_effective_date'] = $sale_start . '/' . $sale_end;
+              }
             }
-            if (@$body['price_effective_date']['end']) {
-              $date_range .= '/' . $body['price_effective_date']['end'];
-            } else {
-              // any future date
-              $date_range .= '/' . date('Y-m-d\TH:i:s\Z', strtotime('+60 days'));
-            }
-            $entry['sale_price_effective_date'] = $date_range;
           }
         } else {
           // eg.: 10.00 BRL
