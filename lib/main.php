@@ -188,7 +188,7 @@ XML;
 
       // prices
       if (isset($body['price'])) {
-        if (isset($body['base_price'])) {
+        if (isset($body['base_price']) && $body['base_price'] > $body['price']) {
           // promotional price
           $entry['price'] = $body['base_price'] . ' ' . @$body['currency_id'];
           $entry['sale_price'] = $body['price'] . ' ' . @$body['currency_id'];
