@@ -290,12 +290,13 @@ XML;
               break;
 
             case 'colors':
+            case 'color':
               // send up to 3 colors
               $colors = str_replace('/', ' ', @$value['text']);
               for ($i = 1; $i < count($values); $i++) {
                 $colors .= '/' . str_replace('/', ' ', @$values[$i]['text']);
               }
-              $entry[$spec] = $colors;
+              $entry['color'] = $colors;
               break;
 
             default:
