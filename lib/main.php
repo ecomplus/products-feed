@@ -151,7 +151,7 @@ XML;
 
       // product photos
       if (isset($body['pictures']) && count($body['pictures'])) {
-        $additional_images = '';
+        $additional_images = array();
         for ($i = 0; $i < count($body['pictures']) && $i < 10; $i++) {
           $img = $body['pictures'][$i];
           $img_link = null;
@@ -174,14 +174,11 @@ XML;
               // first image
               $entry['image_link'] = $img_link;
             } else {
-              if ($additional_images !== '') {
-                $additional_images .= ',';
-              }
-              $additional_images .= str_replace(',', '%2C', $img_link);
+              $additional_images[] = $img_link;
             }
           }
         }
-        if ($additional_images !== '') {
+        if (count($additional_images) > 0) {
           $entry['additional_image_link'] = $additional_images;
         }
       }
