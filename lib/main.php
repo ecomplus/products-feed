@@ -291,6 +291,8 @@ XML;
 
             case 'colors':
             case 'color':
+            case 'cor':
+            case 'cores':
               // send up to 3 colors
               $colors = str_replace('/', ' ', @$value['text']);
               for ($i = 1; $i < count($values); $i++) {
@@ -300,9 +302,66 @@ XML;
               break;
 
             default:
-              // send as custom label
-              if ($custom_label < 5) {
-                $entry['custom_label_' . $custom_label] = @$values[$i]['text'];
+              // parse common GMC specs
+              $common_spec = null;
+              $text = @$values[$i]['value'] || @$values[$i]['text'];
+              switch (strtolower($text)) {
+                case 'm':
+                case 'l':
+                case 'g':
+                case 's':
+                case 'p':
+                case 'xs':
+                case 'pp':
+                case 'xl':
+                case 'gg':
+                case 'xxl':
+                case 'xg':
+                case 'u':
+                case 'Único':
+                case 'unico':
+                  $common_spec = 'size';
+                  break;
+
+                case 'adult':
+                case 'adulto':
+                case 'kids':
+                case 'criança':
+                case 'infant':
+                case 'infantil':
+                case 'newborn':
+                case 'recém-nascido':
+                case 'toddler':
+                  $common_spec = 'age_group';
+                  break;
+
+                case 'male':
+                case 'masculino':
+                case 'female':
+                case 'feminino':
+                case 'unisex':
+                  $common_spec = 'gender';
+                  break;
+
+                case 'homem':
+                  $common_spec = 'gender';
+                  $text = 'male';
+                  break;
+
+                case 'mulher':
+                  $common_spec = 'gender';
+                  $text = 'female';
+                  break;
+
+                default:
+                  // send as custom label
+                  if ($custom_label < 5) {
+                    $entry['custom_label_' . $custom_label] = @$values[$i]['text'];
+                  }
+                  break;
+              }
+              if ($common_spec !== null && !isset($common_spec)) {
+                $entry[$common_spec] = $text;
               }
               break;
           }
