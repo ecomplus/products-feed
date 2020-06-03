@@ -31,5 +31,5 @@ https://storefront.e-com.plus/products-feed.xml?store_id={storeId}&domain={domai
 > Filter products by category
 
 ```
-https://storefront.e-com.plus/products-feed.xml?store_id={storeId}&domain={domain}&set_properties={"google_product_category_id":123}&search_field=categories.slug&search.value=my-category-slug
+https://storefront.e-com.plus/products-feed.xml?store_id={storeId}&domain={domain}&search_field=categories.slug&search.value=my-category-slug&set_properties={"google_product_category_id":123}
 ```
