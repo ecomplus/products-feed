@@ -360,7 +360,7 @@ XML;
                   }
                   break;
               }
-              if ($common_spec !== null && !isset($common_spec)) {
+              if ($common_spec !== null && !isset($entry[$common_spec])) {
                 $entry[$common_spec] = $text;
               }
               break;
