@@ -54,7 +54,7 @@ class ProductsFeed {
 
   function xml ($title, $query_string, $set_properties, $product_ids) {
     if (!$title || trim($title) === '') {
-      $title = 'Products feed #' . $this->store_id . '(' . date('D M j G:i:s T Y') . ')';
+      $title = 'Products feed #' . $this->store_id;
     }
     $date = date('Y-m-d\TH:i:s\Z');
     $xml = <<<XML
