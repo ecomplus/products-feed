@@ -378,7 +378,7 @@ XML;
       // parse to XML string
       $xml = '<entry>';
       foreach ($entry as $key => $value) {
-        if (is_array()) {
+        if (is_array($value)) {
           foreach ($value as $nested_value) {
             $xml .= '<g:' . $key . '><![CDATA[' . $nested_value . ']]></g:' . $key . '>';
           }
