@@ -395,6 +395,12 @@ XML;
       if (isset($body['variations'])) {
         foreach ($body['variations'] as $variation) {
           // use default values from product body
+          if ($body['specifications'] && $variation['specifications']) {
+            $variation['specifications'] = array_merge(
+              $body['specifications'],
+              $variation['specifications']
+            );
+          }
           $variation = array_merge($body, $variation);
           unset($variation['variations']);
 
