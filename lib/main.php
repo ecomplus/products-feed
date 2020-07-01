@@ -239,11 +239,19 @@ XML;
       $codes = array('gtin', 'mpn');
       for ($i = 0; $i < count($codes); $i++) {
         $key = $codes[$i];
-        if (isset($body[$key]) && count($body[$key]) > 0) {
-          // send first code on array only
-          $entry[$key] = $body[$key][0];
-          if (!$identifier_exists) {
-            $identifier_exists = true;
+        if (isset($body[$key])) {
+          if (is_string($body[$key]) && strlen($body[$key]) > 0) {
+            // variation gtin/mpn
+            $entry[$key] = $body[$key];
+            if (!$identifier_exists) {
+              $identifier_exists = true;
+            }
+          } else if (count($body[$key]) > 0) {
+            // send first code on array only
+            $entry[$key] = $body[$key][0];
+            if (!$identifier_exists) {
+              $identifier_exists = true;
+            }
           }
         }
       }
