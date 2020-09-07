@@ -121,7 +121,7 @@ XML;
       // text description
       if (isset($body['body_html'])) {
         $entry['description'] = strip_tags($body['body_html']);
-      } else if (isset($body['body_text'])) {
+      } else if (isset($body['body_text']) && !empty($body['body_text'])) {
         $entry['description'] = $body['body_text'];
       }
 
