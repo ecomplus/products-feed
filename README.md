@@ -12,6 +12,7 @@ https://storefront.e-com.plus/products-feed.xml?store_id={storeId}&domain={domai
 - `query_string`
 - `set_properties` (JSON object)
 - `product_ids` (JSON array)
+- `offset`
 - `search_field`
 - `search_value`
 
@@ -33,4 +34,10 @@ https://storefront.e-com.plus/products-feed.xml?store_id={storeId}&domain={domai
 
 ```
 https://storefront.e-com.plus/products-feed.xml?store_id={storeId}&domain={domain}&search_field=categories.slug&search_value=my-category-slug&set_properties={"google_product_category_id":123}
+```
+
+> Second XML page
+
+```
+https://storefront.e-com.plus/products-feed.xml?store_id={storeId}&domain={domain}&offset=500
 ```
