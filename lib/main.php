@@ -7,11 +7,11 @@ class ProductsFeed {
   private $base_uri; // https://www.mysaleschannel.com/
   private $api_host;
 
-  function __construct ($store_id, $base_uri, $api_host = 'https://api.e-com.plus/v1') {
+  function __construct ($store_id, $base_uri, $api_host = null) {
     // setup store info
     $this->store_id = $store_id;
     $this->base_uri = $base_uri;
-    $this->api_host = $api_host;
+    $this->api_host = $api_host === null ? "https://ioapi.ecvol.com/$store_id/v1" : $api_host;
   }
 
   private function api_request ($endpoint, $method = 'GET', $data = null) {
@@ -38,10 +38,12 @@ class ProductsFeed {
     curl_setopt($curl, CURLOPT_URL, $this->api_host . $endpoint);
     curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
     curl_setopt($curl, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
-    curl_setopt($curl, CURLOPT_HTTPHEADER, array(
-      'X-Store-ID: ' . $this->store_id,
-      'Content-Type: application/json',
-    ));
+    if (strpos($this->api_host, '/' . $this->store_id . '/') === false) {
+      curl_setopt($curl, CURLOPT_HTTPHEADER, array(
+        'X-Store-ID: ' . $this->store_id,
+        'Content-Type: application/json',
+      ));
+    }
 
     $result = curl_exec($curl);
     if (!$result) {
@@ -52,7 +54,7 @@ class ProductsFeed {
     return $result;
   }
 
-  function xml ($title, $query_string, $set_properties, $product_ids) {
+  function xml ($title, $query_string, $set_properties, $product_ids, $offset = 0) {
     if (!$title || trim($title) === '') {
       $title = 'Products feed #' . $this->store_id;
     }
@@ -79,8 +81,10 @@ XML;
     }
 
     // get each product body
-    for ($i = 0; $i < count($product_ids); $i++) {
+    $count = 0;
+    for ($i = $offset; $i < count($product_ids) && $count < 500; $i++) {
       // delay to prevent 503 error
+      $count++;
       usleep($i * 300);
       $json = $this->api_request('/products/' . (string)$product_ids[$i] . '.json');
       $product = json_decode($json, true);
