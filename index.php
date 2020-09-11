@@ -2,7 +2,7 @@
 require './lib/main.php';
 
 function search_products ($field, $value, $store_id) {
-  $endpoint = 'https://apx-search.e-com.plus/api/v1/items.json?q=' . $field . ':' . $value;
+  $endpoint = 'https://apx-search.e-com.plus/api/v1/items.json?size=500&q=' . $field . ':' . $value;
 
   $curl = curl_init();
   curl_setopt($curl, CURLOPT_URL, $endpoint);
@@ -48,5 +48,6 @@ echo $products_feed->xml(
   @$_GET['title'],
   @$_GET['query_string'],
   isset($_GET['set_properties']) ? json_decode($_GET['set_properties'], true) : null,
-  $product_ids
+  $product_ids,
+  @$_GET['offset']
 );
