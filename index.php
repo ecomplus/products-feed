@@ -49,5 +49,5 @@ echo $products_feed->xml(
   @$_GET['query_string'],
   isset($_GET['set_properties']) ? json_decode($_GET['set_properties'], true) : null,
   $product_ids,
-  @$_GET['offset']
+  isset($_GET['offset']) && (int)$_GET['offset'] > 0 ? (int)$_GET['offset'] : 0
 );
