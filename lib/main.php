@@ -166,6 +166,8 @@ XML;
             $img_link = @$img['zoom']['url'];
           } else if (isset($img['big'])) {
             $img_link = @$img['big']['url'];
+          } else if (isset($img['normal'])) {
+            $img_link = @$img['normal']['url'];
           } else {
             foreach ($img as $size => $img_obj) {
               // get any image size excepting small
