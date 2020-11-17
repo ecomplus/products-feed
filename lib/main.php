@@ -169,7 +169,7 @@ XML;
           } else {
             foreach ($img as $size => $img_obj) {
               // get any image size excepting small
-              if ($size !== 'small') {
+              if (is_array($img_obj) && isset($img_obj['url']) && $size !== 'small') {
                 $img_link = @$img_obj['url'];
                 break;
               }
