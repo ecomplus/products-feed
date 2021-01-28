@@ -59,13 +59,7 @@ class ProductsFeed {
       $title = 'Products feed #' . $this->store_id;
     }
     $date = date('Y-m-d\TH:i:s\Z');
-    $xml = <<<XML
-<?xml version="1.0"?>
-<feed xmlns="http://www.w3.org/2005/Atom" xmlns:g="http://base.google.com/ns/1.0">
-  <title><![CDATA[$title]]></title>
-  <link rel="self" href="{$this->base_uri}"/>
-  <updated>$date</updated>
-XML;
+    $rand = rand(10000, 99999);
 
     if (!$product_ids) {
       // get all products
@@ -79,13 +73,22 @@ XML;
         }
       }
     }
+    $total = count($product_ids);
+
+    $xml = <<<XML
+<?xml version="1.0"?>
+<feed xmlns="http://www.w3.org/2005/Atom" xmlns:g="http://base.google.com/ns/1.0">
+  <title><![CDATA[$title : $total #$rand]]></title>
+  <link rel="self" href="{$this->base_uri}"/>
+  <updated>$date</updated>
+XML;
 
     // get each product body
     $count = 0;
-    for ($i = $offset; $i < count($product_ids) && $count < 500; $i++) {
+    for ($i = $offset; $i < $total && $count < 500; $i++) {
       // delay to prevent 503 error
       $count++;
-      usleep($i * 300);
+      usleep(200);
       $json = $this->api_request('/products/' . (string)$product_ids[$i] . '.json');
       $product = json_decode($json, true);
       if (json_last_error() === JSON_ERROR_NONE) {
