@@ -81,7 +81,7 @@ class ProductsFeed {
   <title><![CDATA[$title]]></title>
   <link href="{$this->base_uri}" rel="alternate" type="text/html"/>
   <updated>$date</updated>
-  <id><![CDATA[#{$this->base_uri},(total:$total),(r:$rand),$search_endpoint]]></id>
+  <id><![CDATA[#{$this->store_id},(total:$total),(r:$rand),$search_endpoint]]></id>
   <author>
     <name>E-Com Plus</name>
   </author>
