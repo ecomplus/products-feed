@@ -2,7 +2,7 @@
 require './lib/main.php';
 
 function search_products ($field, $value, $store_id) {
-  $endpoint = 'https://apx-search.e-com.plus/api/v1/items.json?size=500&q=' . $field . ':' . $value;
+  $endpoint = 'https://apx-search.e-com.plus/api/v1/items.json?size=500&q=' . $field . ':"' . $value . '"';
 
   $curl = curl_init();
   curl_setopt($curl, CURLOPT_URL, $endpoint);
