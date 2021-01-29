@@ -23,7 +23,10 @@ function search_products ($field, $value, $store_id) {
       $product_ids[] = $items[$i]->_id;
     }
   }
-  return $product_ids;
+  return array(
+    'endpoint' => $endpoint,
+    'ids' => $product_ids
+  );
 }
 
 $store_id = @$_SERVER['HTTP_X_STORE_ID'];
@@ -38,9 +41,12 @@ $products_feed = new ProductsFeed(
 );
 
 $product_ids = isset($_GET['product_ids']) ? json_decode($_GET['product_ids'], true) : null;
+$search_endpoint = '';
 if (!$product_ids) {
   if (isset($_GET['search_field']) && isset($_GET['search_value'])) {
-    $product_ids = search_products($_GET['search_field'], $_GET['search_value'], $store_id);
+    $search_result = search_products($_GET['search_field'], $_GET['search_value'], $store_id);
+    $product_ids = $search_result['ids'];
+    $search_endpoint = $search_result['endpoint'];
   }
 }
 
@@ -49,5 +55,6 @@ echo $products_feed->xml(
   @$_GET['query_string'],
   isset($_GET['set_properties']) ? json_decode($_GET['set_properties'], true) : null,
   $product_ids,
+  $search_endpoint,
   isset($_GET['offset']) && (int)$_GET['offset'] > 0 ? (int)$_GET['offset'] : 0
 );

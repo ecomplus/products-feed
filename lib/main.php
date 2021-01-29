@@ -54,7 +54,7 @@ class ProductsFeed {
     return $result;
   }
 
-  function xml ($title, $query_string, $set_properties, $product_ids, $offset = 0) {
+  function xml ($title, $query_string, $set_properties, $product_ids, $search_endpoint, $offset = 0) {
     if (!$title || trim($title) === '') {
       $title = 'Products feed #' . $this->store_id;
     }
@@ -78,9 +78,13 @@ class ProductsFeed {
     $xml = <<<XML
 <?xml version="1.0"?>
 <feed xmlns="http://www.w3.org/2005/Atom" xmlns:g="http://base.google.com/ns/1.0">
-  <title><![CDATA[$title : $total #$rand]]></title>
-  <link rel="self" href="{$this->base_uri}"/>
+  <title><![CDATA[$title]]></title>
+  <link href="{$this->base_uri}" rel="alternate" type="text/html"/>
   <updated>$date</updated>
+  <id><![CDATA[#$rand,($total),$search_endpoint]]></id>
+  <author>
+    <name>E-Com Plus</name>
+  </author>
 XML;
 
     // get each product body
