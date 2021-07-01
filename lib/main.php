@@ -1,4 +1,6 @@
 <?php
+require './utf8_sanitize.php';
+
 class ProductsFeed {
   public $xml;
   public $convert;
@@ -133,7 +135,7 @@ XML;
       if (isset($body['body_text'])) {
         $entry['description'] = $body['body_text'];
       } else if (isset($body['body_html'])) {
-        $entry['description'] = strip_tags($body['body_html']);
+        $entry['description'] = utf8_sanitize(strip_tags($body['body_html']));
       }
 
       // product page links
