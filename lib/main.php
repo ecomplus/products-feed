@@ -1,5 +1,5 @@
 <?php
-require './utf8-sanitize.php';
+require './lib/utf8-sanitize.php';
 
 class ProductsFeed {
   public $xml;
