@@ -135,7 +135,8 @@ XML;
       if (isset($body['body_text'])) {
         $entry['description'] = $body['body_text'];
       } else if (isset($body['body_html'])) {
-        $entry['description'] = utf8_sanitize(strip_tags($body['body_html']));
+        $body_text = str_replace('&nbsp;', ' ', preg_replace('#<[^>]+>#', ' ', $body['body_html']));
+        $entry['description'] = utf8_sanitize($body_text);
       }
 
       // product page links
@@ -416,7 +417,7 @@ XML;
       if (isset($body['variations'])) {
         foreach ($body['variations'] as $variation) {
           // use default values from product body
-          if ($body['specifications'] && $variation['specifications']) {
+          if (isset($body['specifications']) && $variation['specifications']) {
             $variation['specifications'] = array_merge(
               $body['specifications'],
               $variation['specifications']
