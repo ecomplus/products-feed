@@ -44,7 +44,9 @@ $is_list_all = @$_SERVER['HTTP_X_PRODUCTS_FEED'] === 'ALL';
 $offset = 0;
 $product_ids = null;
 $search_endpoint = '';
-if (!$is_list_all) {
+if ($is_list_all) {
+  set_time_limit(1800);
+} else {
   $product_ids = isset($_GET['product_ids']) ? json_decode($_GET['product_ids'], true) : null;
   if (!$product_ids) {
     if (isset($_GET['search_field']) && isset($_GET['search_value'])) {
