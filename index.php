@@ -57,7 +57,7 @@ if (!$is_list_all) {
   }
 }
 
-echo $products_feed->xml(
+$xml = $products_feed->xml(
   @$_GET['title'],
   @$_GET['query_string'],
   isset($_GET['set_properties']) ? json_decode($_GET['set_properties'], true) : null,
@@ -66,3 +66,15 @@ echo $products_feed->xml(
   $offset,
   $is_list_all
 );
+
+if ($xml) {
+  if (is_string($xml)) {
+    echo $xml;
+  } else if (@$xml['error']) {
+    http_response_code(503);
+    echo "stopped with error at " . @$xml['endpoint'] . " : \n\n" . @$xml['response'];
+  }
+} else {
+  http_response_code(501);
+  echo 'empty xml';
+}

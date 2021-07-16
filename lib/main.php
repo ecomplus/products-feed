@@ -76,6 +76,9 @@ class ProductsFeed {
       }
     }
     $total = count($product_ids);
+    if ($total > 0) {
+      return null;
+    }
 
     $xml = <<<XML
 <?xml version="1.0"?>
@@ -91,14 +94,15 @@ XML;
 
     // get each product body
     $count = 0;
-    $max_items = $is_list_all ? $total : 500;
+    $max_items = $is_list_all ? 5000 : 500;
     for ($i = $offset; $i < $total && $count < $max_items; $i++) {
       // delay to prevent 503 error
       $count++;
       usleep(200);
-      $json = $this->api_request('/products/' . (string)$product_ids[$i] . '.json');
+      $endpoint = '/products/' . (string)$product_ids[$i] . '.json';
+      $json = $this->api_request($endpoint);
       $product = json_decode($json, true);
-      if (json_last_error() === JSON_ERROR_NONE) {
+      if (json_last_error() === JSON_ERROR_NONE && @$product['_id']) {
         // check if product is available
         if (@$product['available'] === true && @$product['visible'] === true) {
           // convert product to GMC XML entry
@@ -106,6 +110,12 @@ XML;
   {$this->convert($product, $query_string, $set_properties)}
 XML;
         }
+      } else {
+        return array(
+          'error' => true,
+          'endpoint' => $endpoint,
+          'response' => $json
+        );
       }
     }
 
