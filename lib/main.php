@@ -98,7 +98,7 @@ XML;
     for ($i = $offset; $i < $total && $count < $max_items; $i++) {
       // delay to prevent 503 error
       $count++;
-      usleep(200);
+      usleep(300);
       $endpoint = '/products/' . (string)$product_ids[$i] . '.json';
       $json = $this->api_request($endpoint);
       $product = json_decode($json, true);
