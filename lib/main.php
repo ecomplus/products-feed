@@ -56,7 +56,7 @@ class ProductsFeed {
     return $result;
   }
 
-  function xml ($title, $query_string, $set_properties, $product_ids, $search_endpoint, $offset = 0) {
+  function xml ($title, $query_string, $set_properties, $product_ids, $search_endpoint, $offset = 0, $is_list_all) {
     if (!$title || trim($title) === '') {
       $title = 'Products feed #' . $this->store_id;
     }
@@ -91,7 +91,8 @@ XML;
 
     // get each product body
     $count = 0;
-    for ($i = $offset; $i < $total && $count < 500; $i++) {
+    $max_items = $is_list_all ? $total : 500;
+    for ($i = $offset; $i < $total && $count < $max_items; $i++) {
       // delay to prevent 503 error
       $count++;
       usleep(200);

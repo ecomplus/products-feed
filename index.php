@@ -40,13 +40,20 @@ $products_feed = new ProductsFeed(
   'https://' . @$_SERVER['HTTP_X_STORE_DOMAIN'] . '/'
 );
 
-$product_ids = isset($_GET['product_ids']) ? json_decode($_GET['product_ids'], true) : null;
+$is_list_all = isset($_GET['all']);
+$offset = 0;
+$product_ids = null;
 $search_endpoint = '';
-if (!$product_ids) {
-  if (isset($_GET['search_field']) && isset($_GET['search_value'])) {
-    $search_result = search_products($_GET['search_field'], $_GET['search_value'], $store_id);
-    $product_ids = $search_result['ids'];
-    $search_endpoint = $search_result['endpoint'];
+if (!$is_list_all) {
+  $product_ids = isset($_GET['product_ids']) ? json_decode($_GET['product_ids'], true) : null;
+  if (!$product_ids) {
+    if (isset($_GET['search_field']) && isset($_GET['search_value'])) {
+      $search_result = search_products($_GET['search_field'], $_GET['search_value'], $store_id);
+      $product_ids = $search_result['ids'];
+      $search_endpoint = $search_result['endpoint'];
+    } else if (isset($_GET['offset']) && (int)$_GET['offset'] > 0) {
+      $offset = (int)$_GET['offset'];
+    }
   }
 }
 
@@ -56,5 +63,6 @@ echo $products_feed->xml(
   isset($_GET['set_properties']) ? json_decode($_GET['set_properties'], true) : null,
   $product_ids,
   $search_endpoint,
-  isset($_GET['offset']) && (int)$_GET['offset'] > 0 ? (int)$_GET['offset'] : 0
+  $offset,
+  $is_list_all
 );
