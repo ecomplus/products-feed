@@ -37,7 +37,7 @@ if (!$store_id) {
 
 $products_feed = new ProductsFeed(
   $store_id,
-  'https://' . @$_SERVER['HTTP_X_STORE_DOMAIN'] . '/'
+  (@$_GET['base_uri'] || 'https://' . @$_SERVER['HTTP_X_STORE_DOMAIN'] . '/')
 );
 
 $is_list_all = isset($_GET['all']);
