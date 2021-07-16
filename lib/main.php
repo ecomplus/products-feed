@@ -76,7 +76,7 @@ class ProductsFeed {
       }
     }
     $total = count($product_ids);
-    if ($total > 0) {
+    if ($total <= 0) {
       return null;
     }
 
