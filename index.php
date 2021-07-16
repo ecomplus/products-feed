@@ -40,7 +40,7 @@ $products_feed = new ProductsFeed(
   (@$_GET['base_uri'] || 'https://' . @$_SERVER['HTTP_X_STORE_DOMAIN'] . '/')
 );
 
-$is_list_all = isset($_GET['all']);
+$is_list_all = @$_SERVER['HTTP_X_PRODUCTS_FEED'] === 'ALL';
 $offset = 0;
 $product_ids = null;
 $search_endpoint = '';
