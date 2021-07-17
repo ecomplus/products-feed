@@ -109,7 +109,7 @@ XML;
           if (@$product['available'] === true && @$product['visible'] === true) {
             // convert product to GMC XML entry
             $xml .= <<<XML
-    {$this->convert($product, $query_string, $set_properties)}
+  {$this->convert($product, $query_string, $set_properties)}
 XML;
           }
           $is_retry = false;
