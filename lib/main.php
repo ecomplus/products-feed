@@ -95,6 +95,7 @@ XML;
     // get each product body
     $count = 0;
     $max_items = $is_list_all ? 5000 : 500;
+    $is_retry = false;
     for ($i = $offset; $i < $total && $count < $max_items; $i++) {
       // delay to prevent 503 error
       $count++;
@@ -102,21 +103,30 @@ XML;
       $endpoint = '/products/' . (string)$product_ids[$i] . '.json';
       $json = $this->api_request($endpoint);
       $product = json_decode($json, true);
-      if (json_last_error() === JSON_ERROR_NONE && @$product['_id']) {
-        // check if product is available
-        if (@$product['available'] === true && @$product['visible'] === true) {
-          // convert product to GMC XML entry
-          $xml .= <<<XML
-  {$this->convert($product, $query_string, $set_properties)}
-XML;
+      if (json_last_error() === JSON_ERROR_NONE) {
+        if (@$product['_id']) {
+          // check if product is available
+          if (@$product['available'] === true && @$product['visible'] === true) {
+            // convert product to GMC XML entry
+            $xml .= <<<XML
+    {$this->convert($product, $query_string, $set_properties)}
+  XML;
+            $is_retry = false;
+            continue;
+          }
+        } else if (!$is_retry && @$product['status'] === 503) {
+          $is_retry = true;
+          $i--;
+          usleep(900);
+          continue;
         }
-      } else {
-        return array(
-          'error' => true,
-          'endpoint' => $endpoint,
-          'response' => $json
-        );
       }
+
+      return array(
+        'error' => true,
+        'endpoint' => $endpoint,
+        'response' => $json
+      );
     }
 
     $xml .= <<<XML
