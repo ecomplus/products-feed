@@ -35,9 +35,14 @@ if (!$store_id) {
   exit();
 }
 
+$base_uri = @$_GET['base_uri'];
+if (!$base_uri) {
+  $base_uri = 'https://' . @$_SERVER['HTTP_X_STORE_DOMAIN'] . '/';
+}
 $products_feed = new ProductsFeed(
   $store_id,
-  (@$_GET['base_uri'] || 'https://' . @$_SERVER['HTTP_X_STORE_DOMAIN'] . '/')
+  $base_uri,
+  @$_SERVER['HTTP_X_STORE_API_HOST']
 );
 
 $is_list_all = @$_SERVER['HTTP_X_PRODUCTS_FEED'] === 'ALL';

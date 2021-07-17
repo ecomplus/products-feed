@@ -13,7 +13,7 @@ class ProductsFeed {
     // setup store info
     $this->store_id = $store_id;
     $this->base_uri = $base_uri;
-    $this->api_host = $api_host === null ? "https://ioapi.ecvol.com/$store_id/v1" : $api_host;
+    $this->api_host = $api_host ? $api_host : "https://ioapi.ecvol.com/$store_id/v1";
   }
 
   private function api_request ($endpoint, $method = 'GET', $data = null) {
@@ -350,7 +350,10 @@ XML;
             default:
               // parse common GMC specs
               $common_spec = null;
-              $text = @$values[$i]['value'] || @$values[$i]['text'];
+              $text = @$values[$i]['value'];
+              if (!$text) {
+                $text = @$values[$i]['text'];
+              }
               switch (strtolower($text)) {
                 case 'm':
                 case 'l':
