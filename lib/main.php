@@ -111,13 +111,13 @@ XML;
             $xml .= <<<XML
     {$this->convert($product, $query_string, $set_properties)}
   XML;
-            $is_retry = false;
-            continue;
           }
+          $is_retry = false;
+          continue;
         } else if (!$is_retry && @$product['status'] === 503) {
-          $is_retry = true;
-          $i--;
           usleep(900);
+          $i--;
+          $is_retry = true;
           continue;
         }
       }
