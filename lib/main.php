@@ -99,7 +99,7 @@ XML;
     for ($i = $offset; $i < $total && $count < $max_items; $i++) {
       // delay to prevent 503 error
       $count++;
-      usleep(300);
+      usleep(120 * 1000);
       $endpoint = '/products/' . (string)$product_ids[$i] . '.json';
       $json = $this->api_request($endpoint);
       $product = json_decode($json, true);
@@ -115,7 +115,7 @@ XML;
           $is_retry = false;
           continue;
         } else if (!$is_retry && @$product['status'] === 503) {
-          usleep(900);
+          usleep(800 * 1000);
           $i--;
           $is_retry = true;
           continue;
