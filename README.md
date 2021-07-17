@@ -41,3 +41,11 @@ https://storefront.e-com.plus/products-feed.xml?store_id={storeId}&domain={domai
 ```
 https://storefront.e-com.plus/products-feed.xml?store_id={storeId}&domain={domain}&offset=500
 ```
+
+## All products XML
+
+https://storefront.e-com.plus/products-feed/all.xml?store_id={storeId}&domain={domain}
+
+Up to 5000 products (may have more items due to variations) at the same XML.
+
+:warning: Long time to load and long cache lifetime, AVOID USING it whenever possible!
