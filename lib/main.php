@@ -110,7 +110,7 @@ XML;
             // convert product to GMC XML entry
             $xml .= <<<XML
     {$this->convert($product, $query_string, $set_properties)}
-  XML;
+XML;
           }
           $is_retry = false;
           continue;
