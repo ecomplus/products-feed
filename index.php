@@ -45,7 +45,7 @@ $offset = 0;
 $product_ids = null;
 $search_endpoint = '';
 if ($is_list_all) {
-  set_time_limit(1800);
+  set_time_limit(1680);
 } else {
   $product_ids = isset($_GET['product_ids']) ? json_decode($_GET['product_ids'], true) : null;
   if (!$product_ids) {
