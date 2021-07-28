@@ -91,10 +91,6 @@ if ($is_list_all) {
   ob_end_flush();
   @ob_flush();
   flush();
-  try {
-    fastcgi_finish_request();
-  } catch (Exception $e) {
-  }
 }
 
 $xml = $products_feed->xml(
