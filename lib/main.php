@@ -98,8 +98,7 @@ XML;
       file_put_contents($wip_output_file, $xml);
     }
 
-    function concat_xml ($partial_xml, $is_end = false) {
-      global $xml, $output_file, $wip_output_file;
+    $concat_xml = function($partial_xml, $is_end = false) use (&$xml, $output_file, $wip_output_file) {
       if ($output_file) {
         file_put_contents($wip_output_file ? $wip_output_file : $output_file, $partial_xml, FILE_APPEND);
         if ($is_end) {
@@ -111,7 +110,7 @@ XML;
         return $xml;
       }
       return null;
-    }
+    };
 
     // get each product body
     $count = 0;
@@ -132,7 +131,7 @@ XML;
             $item_xml = <<<XML
   {$this->convert($product, $query_string, $set_properties)}
 XML;
-            concat_xml($item_xml);
+            $concat_xml($item_xml);
           }
           $is_retry = false;
           continue;
@@ -151,7 +150,7 @@ XML;
       );
     }
 
-    return concat_xml("\n</feed>", true);
+    return $concat_xml("\n</feed>", true);
   }
 
   function convert ($body, $query_string, $set_properties, $group_id = null) {
