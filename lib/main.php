@@ -91,8 +91,26 @@ class ProductsFeed {
     <name>E-Com Plus</name>
   </author>
 XML;
+
+    $wip_output_file = null;
     if ($output_file) {
-      file_put_contents($output_file, $xml);
+      $wip_output_file = "$output_file.wip"; 
+      file_put_contents($wip_output_file, $xml);
+    }
+
+    function concat_xml ($partial_xml, $is_end = false) {
+      global $xml, $output_file, $wip_output_file;
+      if ($output_file) {
+        file_put_contents($wip_output_file ? $wip_output_file : $output_file, $partial_xml, FILE_APPEND);
+        if ($is_end) {
+          rename($wip_output_file, $output_file);
+          return true;
+        }
+      } else {
+        $xml .= $partial_xml;
+        return $xml;
+      }
+      return null;
     }
 
     // get each product body
@@ -114,11 +132,7 @@ XML;
             $item_xml = <<<XML
   {$this->convert($product, $query_string, $set_properties)}
 XML;
-            if ($output_file) {
-              file_put_contents($output_file, $item_xml, FILE_APPEND);
-            } else {
-              $xml .= $item_xml;
-            }
+            concat_xml($item_xml);
           }
           $is_retry = false;
           continue;
@@ -137,13 +151,7 @@ XML;
       );
     }
 
-    if ($output_file) {
-      file_put_contents($output_file, "\n</feed>", FILE_APPEND);
-      return true;
-    } else {
-      $xml .= "\n</feed>";
-      return $xml;
-    }
+    return concat_xml("\n</feed>", true);
   }
 
   function convert ($body, $query_string, $set_properties, $group_id = null) {

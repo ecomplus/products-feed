@@ -77,8 +77,8 @@ if ($is_list_all) {
   ob_start();
 
   $output_file = "/tmp/products-feed-$store_id.xml";
-  $stored_xml = file_get_contents($output_file);
-  if ($stored_xml) {
+  if (file_exists($output_file)) {
+    $stored_xml = file_get_contents($output_file);
     echo $stored_xml;
   } else {
     http_response_code(202);
