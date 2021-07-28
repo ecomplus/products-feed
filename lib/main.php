@@ -56,7 +56,7 @@ class ProductsFeed {
     return $result;
   }
 
-  function xml ($title, $query_string, $set_properties, $product_ids, $search_endpoint, $offset = 0, $is_list_all) {
+  function xml ($title, $query_string, $set_properties, $product_ids, $search_endpoint, $offset = 0, $is_list_all, $output_file) {
     if (!$title || trim($title) === '') {
       $title = 'Products feed #' . $this->store_id;
     }
@@ -91,6 +91,9 @@ class ProductsFeed {
     <name>E-Com Plus</name>
   </author>
 XML;
+    if ($output_file) {
+      file_put_contents($output_file, $xml);
+    }
 
     // get each product body
     $count = 0;
@@ -108,9 +111,14 @@ XML;
           // check if product is available
           if (@$product['available'] === true && @$product['visible'] === true) {
             // convert product to GMC XML entry
-            $xml .= <<<XML
+            $item_xml = <<<XML
   {$this->convert($product, $query_string, $set_properties)}
 XML;
+            if ($output_file) {
+              file_put_contents($output_file, $item_xml, FILE_APPEND);
+            } else {
+              $xml .= $item_xml;
+            }
           }
           $is_retry = false;
           continue;
@@ -129,10 +137,13 @@ XML;
       );
     }
 
-    $xml .= <<<XML
-</feed>
-XML;
-    return $xml;
+    if ($output_file) {
+      file_put_contents($output_file, "\n</feed>", FILE_APPEND);
+      return true;
+    } else {
+      $xml .= "\n</feed>";
+      return $xml;
+    }
   }
 
   function convert ($body, $query_string, $set_properties, $group_id = null) {

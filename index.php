@@ -2,7 +2,7 @@
 require './lib/main.php';
 
 try {
-  ini_set('memory_limit', '256M');
+  ini_set('memory_limit', '128M');
 } catch (Exception $e) {
   error_log("Caught $e");
 }
@@ -56,6 +56,7 @@ $offset = 0;
 $product_ids = null;
 $search_endpoint = '';
 if ($is_list_all) {
+  ignore_user_abort(true);
   set_time_limit(1680);
 } else {
   $product_ids = isset($_GET['product_ids']) ? json_decode($_GET['product_ids'], true) : null;
@@ -70,6 +71,32 @@ if ($is_list_all) {
   }
 }
 
+$output_file = null;
+$is_response_sent = false;
+if ($is_list_all) {
+  ob_start();
+
+  $output_file = "/tmp/products-feed-$store_id.xml";
+  $stored_xml = file_get_contents($output_file);
+  if ($stored_xml) {
+    echo $stored_xml;
+  } else {
+    http_response_code(202);
+    echo 'xml is being generated, come back soon';
+  }
+  $is_response_sent = true;
+
+  header('Connection: close');
+  header('Content-Length: ' . ob_get_length());
+  ob_end_flush();
+  @ob_flush();
+  flush();
+  try {
+    fastcgi_finish_request();
+  } catch (Exception $e) {
+  }
+}
+
 $xml = $products_feed->xml(
   @$_GET['title'],
   @$_GET['query_string'],
@@ -77,17 +104,20 @@ $xml = $products_feed->xml(
   $product_ids,
   $search_endpoint,
   $offset,
-  $is_list_all
+  $is_list_all,
+  $output_file
 );
 
-if ($xml) {
-  if (is_string($xml)) {
-    echo $xml;
-  } else if (@$xml['error']) {
-    http_response_code(503);
-    echo "stopped with error at " . @$xml['endpoint'] . " : \n\n" . @$xml['response'];
+if (!$is_response_sent) {
+  if ($xml) {
+    if (is_string($xml)) {
+      echo $xml;
+    } else if (@$xml['error']) {
+      http_response_code(503);
+      echo "stopped with error at " . @$xml['endpoint'] . " : \n\n" . @$xml['response'];
+    }
+  } else {
+    http_response_code(501);
+    echo 'empty xml';
   }
-} else {
-  http_response_code(501);
-  echo 'empty xml';
 }
