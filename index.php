@@ -1,6 +1,12 @@
 <?php
 require './lib/main.php';
 
+try {
+  ini_set('memory_limit', '256M');
+} catch (Exception $e) {
+  error_log("Caught $e");
+}
+
 function search_products ($field, $value, $store_id) {
   $endpoint = 'https://apx-search.e-com.plus/api/v1/items.json?size=500&q=' . $field . ':"' . $value . '"';
 
