@@ -168,6 +168,11 @@ XML;
       } else if (isset($body['body_html'])) {
         $body_text = str_replace('&nbsp;', ' ', preg_replace('#<[^>]+>#', ' ', $body['body_html']));
         $entry['description'] = utf8_sanitize($body_text);
+      } else {
+        $entry['description'] = @$body['short_description'];
+      }
+      if (!$entry['description'] || strlen($entry['description']) < 3) {
+        $entry['description'] = $body['name'];
       }
 
       // product page links
