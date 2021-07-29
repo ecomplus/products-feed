@@ -171,15 +171,14 @@ XML;
       }
 
       // product page links
-      $entry['link'] = '<!--' . $body['_id'] . '-->';
       if (isset($body['permalink'])) {
-        $entry['link'] .= $body['permalink'] . $query_string;
+        $entry['link'] = $body['permalink'] . $query_string;
       } else if (strpos($this->base_uri, '{{_id}}')) {
-        $entry['link'] .= str_replace('{{_id}}', $body['_id'], $this->base_uri);
+        $entry['link'] = str_replace('{{_id}}', $body['_id'], $this->base_uri);
       } else if (isset($body['slug'])) {
-        $entry['link'] .= $this->base_uri . $body['slug'] . $query_string;
+        $entry['link'] = $this->base_uri . $body['slug'] . $query_string;
       } else {
-        $entry['link'] .= $this->base_uri . $query_string . '&_id=' . $body['_id'];
+        $entry['link'] = $this->base_uri . $query_string . '&_id=' . $body['_id'];
       }
       if (isset($body['mobile_link'])) {
         $entry['mobile_link'] = $body['mobile_link'] . $query_string;
@@ -446,6 +445,8 @@ XML;
           foreach ($value as $nested_value) {
             $xml .= '<g:' . $key . '><![CDATA[' . $nested_value . ']]></g:' . $key . '>';
           }
+        } else if ($key === 'link') {
+          $xml .= '<g:' . $key . '><!--' . $body['_id'] . '-->' . $value . '</g:' . $key . '>';
         } else {
           $xml .= '<g:' . $key . '><![CDATA[' . $value . ']]></g:' . $key . '>';
         }
