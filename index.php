@@ -101,6 +101,10 @@ if ($is_list_all) {
   ob_end_flush();
   @ob_flush();
   flush();
+
+  if (file_exists($output_file) && time() - filemtime($output_file) <= 600) {
+    exit();
+  }
 }
 
 $products_feed = new ProductsFeed(
