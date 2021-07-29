@@ -87,6 +87,10 @@ if ($is_list_all) {
     $stored_xml = file_get_contents($output_file);
   }
   if (is_string($stored_xml) && strlen($stored_xml) > 10) {
+    $link_replacement = strpos($base_uri, '{{_id}}')
+      ? str_replace('{{_id}}', '$1', $base_uri)
+      : $base_uri . '$2';
+    preg_replace('/<!--([a-z0-9]+)-->{{base_uri}}([^<\s\n]+)/i', $link_replacement, $stored_xml);
     echo str_replace('{{base_uri}}', $base_uri, $stored_xml);
   } else {
     http_response_code(202);
