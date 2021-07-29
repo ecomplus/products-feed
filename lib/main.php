@@ -173,6 +173,8 @@ XML;
       // product page links
       if (isset($body['permalink'])) {
         $entry['link'] = $body['permalink'] . $query_string;
+      } else if (strpos($this->base_uri, '{{_id}}')) {
+        $entry['link'] = str_replace('{{_id}}', $body['_id'], $this->base_uri);
       } else if (isset($body['slug'])) {
         $entry['link'] = $this->base_uri . $body['slug'] . $query_string;
       } else {
