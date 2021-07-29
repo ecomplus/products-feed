@@ -92,24 +92,16 @@ class ProductsFeed {
   </author>
 XML;
 
-    $wip_output_file = null;
     if ($output_file) {
-      $wip_output_file = "$output_file.wip"; 
-      file_put_contents($wip_output_file, $xml);
+      file_put_contents($output_file, $xml);
     }
-
-    $concat_xml = function($partial_xml, $is_end = false) use (&$xml, $output_file, $wip_output_file) {
+    $concat_xml = function($partial_xml) use (&$xml, $output_file) {
       if ($output_file) {
-        file_put_contents($wip_output_file ? $wip_output_file : $output_file, $partial_xml, FILE_APPEND);
-        if ($is_end) {
-          rename($wip_output_file, $output_file);
-          return true;
-        }
+        return file_put_contents($output_file, $partial_xml, FILE_APPEND);
       } else {
         $xml .= $partial_xml;
         return $xml;
       }
-      return null;
     };
 
     // get each product body

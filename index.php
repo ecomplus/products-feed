@@ -73,16 +73,21 @@ if ($is_list_all) {
 }
 
 $output_file = null;
-$is_response_sent = false;
+$wip_output_file = null;
 if ($is_list_all) {
+  $output_file = "/tmp/products-feed-$store_id-$store_domain.xml";
+  $wip_output_file = "$output_file.wip";
+  if (file_exists($wip_output_file) && time() - filemtime($wip_output_file) <= 3600) {
+    http_response_code(202);
+    echo "work in progress: \n\n";
+    echo file_get_contents($wip_output_file);
+    exit();
+  }
   ob_start();
 
-  $output_file = "/tmp/products-feed-$store_id-$store_domain.xml";
   $stored_xml = null;
   if (file_exists($output_file)) {
     $stored_xml = file_get_contents($output_file);
-  } else {
-    file_put_contents($output_file, '-');
   }
   if (is_string($stored_xml) && strlen($stored_xml) > 10) {
     echo $stored_xml;
@@ -90,7 +95,6 @@ if ($is_list_all) {
     http_response_code(202);
     echo 'xml is being generated, come back soon';
   }
-  $is_response_sent = true;
 
   header('Connection: close');
   header('Content-Length: ' . ob_get_length());
@@ -107,10 +111,10 @@ $xml = $products_feed->xml(
   $search_endpoint,
   $offset,
   $is_list_all,
-  $output_file
+  $wip_output_file
 );
 
-if (!$is_response_sent) {
+if (!$output_file) {
   if ($xml) {
     if (is_string($xml)) {
       echo $xml;
@@ -122,4 +126,6 @@ if (!$is_response_sent) {
     http_response_code(501);
     echo 'empty xml';
   }
+} else if ($xml) {
+  rename($wip_output_file, $output_file);
 }
