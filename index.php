@@ -46,11 +46,6 @@ $base_uri = @$_GET['base_uri'];
 if (!$base_uri) {
   $base_uri = 'https://' . $store_domain . '/';
 }
-$products_feed = new ProductsFeed(
-  $store_id,
-  $base_uri,
-  @$_SERVER['HTTP_X_STORE_API_HOST']
-);
 
 $is_list_all = @$_SERVER['HTTP_X_PRODUCTS_FEED'] === 'ALL';
 $offset = 0;
@@ -75,7 +70,7 @@ if ($is_list_all) {
 $output_file = null;
 $wip_output_file = null;
 if ($is_list_all) {
-  $output_file = "/tmp/products-feed-$store_id-$store_domain.xml";
+  $output_file = "/tmp/products-feed-$store_id.xml";
   $wip_output_file = "$output_file.wip";
   if (file_exists($wip_output_file) && time() - filemtime($wip_output_file) <= 3600) {
     http_response_code(202);
@@ -90,7 +85,7 @@ if ($is_list_all) {
     $stored_xml = file_get_contents($output_file);
   }
   if (is_string($stored_xml) && strlen($stored_xml) > 10) {
-    echo $stored_xml;
+    echo str_replace('{{base_uri}}', $base_uri, $stored_xml);
   } else {
     http_response_code(202);
     echo 'xml is being generated, come back soon';
@@ -103,10 +98,16 @@ if ($is_list_all) {
   flush();
 }
 
+$products_feed = new ProductsFeed(
+  $store_id,
+  !$output_file ? $base_uri : '{{base_uri}}',
+  @$_SERVER['HTTP_X_STORE_API_HOST']
+);
+
 $xml = $products_feed->xml(
-  @$_GET['title'],
-  @$_GET['query_string'],
-  isset($_GET['set_properties']) ? json_decode($_GET['set_properties'], true) : null,
+  !$is_list_all ? @$_GET['title'] : null,
+  !$is_list_all ? @$_GET['query_string'] : null,
+  !$is_list_all && isset($_GET['set_properties']) ? json_decode($_GET['set_properties'], true) : null,
   $product_ids,
   $search_endpoint,
   $offset,
