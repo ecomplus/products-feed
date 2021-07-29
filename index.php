@@ -90,8 +90,7 @@ if ($is_list_all) {
     $link_replacement = strpos($base_uri, '{{_id}}')
       ? str_replace('{{_id}}', '$1', $base_uri)
       : $base_uri . '$2';
-    preg_replace('/<!--([a-z0-9]+)-->{{base_uri}}([^<\s\n]+)/i', $link_replacement, $stored_xml);
-    echo str_replace('{{base_uri}}', $base_uri, $stored_xml);
+    echo preg_replace('/<!--([a-z0-9]+)-->{{base_uri}}([^<\s\n]+)/i', $link_replacement, $stored_xml);
   } else {
     http_response_code(202);
     echo 'xml is being generated, come back soon';
