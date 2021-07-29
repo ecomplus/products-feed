@@ -307,7 +307,9 @@ XML;
       $entry['identifier_exists'] = $identifier_exists ? 'yes' : 'no';
 
       // product types
-      $entry['adult'] = @$body['adult'] === true ? 'yes' : 'no';
+      if (@$body['adult'] === true) {
+        $entry['adult'] = 'yes';
+      }
       if (isset($body['condition'])) {
         $entry['condition'] = $body['condition'] !== 'not_specified' ? $body['condition'] : 'new';
       }
