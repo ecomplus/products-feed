@@ -36,6 +36,7 @@ function search_products ($field, $value, $store_id) {
 }
 
 $store_id = @$_SERVER['HTTP_X_STORE_ID'];
+$store_domain = @$_SERVER['HTTP_X_STORE_DOMAIN'];
 if (!$store_id) {
   echo 'Store ID unset';
   exit();
@@ -43,7 +44,7 @@ if (!$store_id) {
 
 $base_uri = @$_GET['base_uri'];
 if (!$base_uri) {
-  $base_uri = 'https://' . @$_SERVER['HTTP_X_STORE_DOMAIN'] . '/';
+  $base_uri = 'https://' . $store_domain . '/';
 }
 $products_feed = new ProductsFeed(
   $store_id,
@@ -76,9 +77,14 @@ $is_response_sent = false;
 if ($is_list_all) {
   ob_start();
 
-  $output_file = "/tmp/products-feed-$store_id.xml";
+  $output_file = "/tmp/products-feed-$store_id-$store_domain.xml";
+  $stored_xml = null;
   if (file_exists($output_file)) {
     $stored_xml = file_get_contents($output_file);
+  } else {
+    file_put_contents($output_file, '-');
+  }
+  if (is_string($stored_xml) && strlen($stored_xml) > 10) {
     echo $stored_xml;
   } else {
     http_response_code(202);
