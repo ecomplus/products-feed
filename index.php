@@ -42,9 +42,11 @@ if (!$store_id) {
   exit();
 }
 
-$base_uri = @$_GET['base_uri'];
-if (!$base_uri) {
-  $base_uri = 'https://' . $store_domain . '/';
+$base_uri = 'https://' . $store_domain;
+if (isset($_GET['base_path'])) {
+  $base_uri .= $_GET['base_path'];
+} else {
+  $base_uri .= '/';
 }
 
 $is_list_all = @$_SERVER['HTTP_X_PRODUCTS_FEED'] === 'ALL';
