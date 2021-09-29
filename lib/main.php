@@ -225,6 +225,7 @@ XML;
           }
 
           if ($img_link) {
+            $img_link = preg_replace('/(\w+\.)?(ecoms\d)\.com/i', '$2-nyc3.nyc3.cdn.digitaloceanspaces.com', $img_link);
             if ($i === 0) {
               // first image
               $entry['image_link'] = $img_link;
