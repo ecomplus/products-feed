@@ -471,6 +471,9 @@ XML;
               $variation['specifications']
             );
           }
+          if (!isset($variation['sku']) && isset($body['sku'])) {
+            $variation['sku'] = $body['sku'] . '-' . rand(100, 999);
+          }
           $variation = array_merge($body, $variation);
           unset($variation['variations']);
 
