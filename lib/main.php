@@ -293,13 +293,15 @@ XML;
       for ($i = 0; $i < count($codes); $i++) {
         $key = $codes[$i];
         if (isset($body[$key])) {
-          if (is_string($body[$key]) && strlen($body[$key]) > 0) {
+          if (is_string($body[$key])) {
             // variation gtin/mpn
-            $entry[$key] = $body[$key];
-            if (!$identifier_exists) {
-              $identifier_exists = true;
+            if (strlen($body[$key]) > 0) {
+              $entry[$key] = $body[$key];
+              if (!$identifier_exists) {
+                $identifier_exists = true;
+              }
             }
-          } else if (count($body[$key]) > 0) {
+          } else if (is_array($body[$key]) && count($body[$key]) > 0) {
             // send first code on array only
             $entry[$key] = $body[$key][0];
             if (!$identifier_exists) {
