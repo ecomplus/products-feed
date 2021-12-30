@@ -447,7 +447,7 @@ XML;
       }
 
       // parse to XML string
-      $xml = '<entry>';
+      $xml = "\n<entry>";
       foreach ($entry as $key => $value) {
         if (is_array($value)) {
           foreach ($value as $nested_value) {
