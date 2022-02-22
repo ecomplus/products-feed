@@ -2,7 +2,7 @@
 require './lib/main.php';
 
 try {
-  ini_set('memory_limit', '200M');
+  ini_set('memory_limit', '300M');
 } catch (Exception $e) {
   error_log("Caught $e");
 }
