@@ -181,7 +181,7 @@ XML;
       } else if (strpos($this->base_uri, '{{_id}}')) {
         $entry['link'] = str_replace('{{_id}}', $body['_id'], $this->base_uri);
       } else if (isset($body['slug']) && $group_id) {
-        $entry['link'] = $this->base_uri . $body['slug'] . $query_string . '&variationId=' . $body['_id'];
+        $entry['link'] = $this->base_uri . $body['slug'] . $query_string . '&variation_id=' . $body['_id'];
       } else if (isset($body['slug'])) {
         $entry['link'] = $this->base_uri . $body['slug'] . $query_string;
       } else {
