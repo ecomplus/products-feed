@@ -180,10 +180,12 @@ XML;
         $entry['link'] = $body['permalink'] . $query_string;
       } else if (strpos($this->base_uri, '{{_id}}')) {
         $entry['link'] = str_replace('{{_id}}', $body['_id'], $this->base_uri);
-      } else if (isset($body['slug']) && $group_id) {
-        $entry['link'] = $this->base_uri . $body['slug'] . $query_string . '&variation_id=' . $body['_id'];
       } else if (isset($body['slug'])) {
         $entry['link'] = $this->base_uri . $body['slug'] . $query_string;
+        if ($group_id) {
+          $entry['link'] .= ($query_string ? '&' : '?');
+          $entry['link'] .= 'variation_id=' . $body['_id'];
+        }
       } else {
         $entry['link'] = $this->base_uri . $query_string . '&_id=' . $body['_id'];
       }
