@@ -51,7 +51,8 @@ if (isset($_GET['base_path'])) {
 
 $is_list_all = @$_SERVER['HTTP_X_PRODUCTS_FEED'] === 'ALL';
 $offset = 0;
-$hasVariations = true
+$hasVariations = true;
+$discount = 0;
 $product_ids = null;
 $search_endpoint = '';
 if ($is_list_all) {
@@ -75,6 +76,10 @@ $wip_output_file = null;
 
 if (isset($_GET['variations'])) {
   $hasVariations = $_GET['variations']
+}
+
+if (isset($_GET['discount'])) {
+  $discount = $_GET['discount']
 }
 
 if ($is_list_all) {
@@ -128,7 +133,8 @@ $xml = $products_feed->xml(
   $offset,
   $is_list_all,
   $wip_output_file,
-  $hasVariations
+  $hasVariations,
+  $discount
 );
 
 if (!$output_file) {
