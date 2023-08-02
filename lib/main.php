@@ -56,7 +56,7 @@ class ProductsFeed {
     return $result;
   }
 
-  function xml ($title, $query_string, $set_properties, $product_ids, $search_endpoint, $offset = 0, $is_list_all, $output_file) {
+  function xml ($title, $query_string, $set_properties, $product_ids, $search_endpoint, $offset = 0, $is_list_all, $output_file, $hasVariations = true) {
     if (!$title || trim($title) === '') {
       $title = 'Products feed #' . $this->store_id;
     }
@@ -466,7 +466,7 @@ XML;
       $xml .= '</entry>';
 
       // handle product variations recursively
-      if (isset($body['variations'])) {
+      if (isset($body['variations']) && $hasVariations) {
         foreach ($body['variations'] as $variation) {
           // use default values from product body
           if (isset($body['specifications']) && $variation['specifications']) {

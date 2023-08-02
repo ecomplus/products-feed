@@ -51,6 +51,7 @@ if (isset($_GET['base_path'])) {
 
 $is_list_all = @$_SERVER['HTTP_X_PRODUCTS_FEED'] === 'ALL';
 $offset = 0;
+$hasVariations = true
 $product_ids = null;
 $search_endpoint = '';
 if ($is_list_all) {
@@ -71,6 +72,11 @@ if ($is_list_all) {
 
 $output_file = null;
 $wip_output_file = null;
+
+if (isset($_GET['variations'])) {
+  $hasVariations = $_GET['variations']
+}
+
 if ($is_list_all) {
   $output_file = "/tmp/products-feed-$store_id.xml";
   $wip_output_file = "$output_file.wip";
@@ -121,7 +127,8 @@ $xml = $products_feed->xml(
   $search_endpoint,
   $offset,
   $is_list_all,
-  $wip_output_file
+  $wip_output_file,
+  $hasVariations
 );
 
 if (!$output_file) {
