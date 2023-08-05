@@ -470,7 +470,7 @@ XML;
       $xml .= '</entry>';
 
       // handle product variations recursively
-      if (isset($body['variations']) && $hasVariations) {
+      if (isset($body['variations']) && !$is_skip_variations) {
         foreach ($body['variations'] as $variation) {
           // use default values from product body
           if (isset($body['specifications']) && $variation['specifications']) {
