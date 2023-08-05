@@ -51,7 +51,7 @@ if (isset($_GET['base_path'])) {
 
 $is_list_all = @$_SERVER['HTTP_X_PRODUCTS_FEED'] === 'ALL';
 $offset = 0;
-$hasVariations = true;
+$is_skip_variations = false;
 $discount = 0;
 $product_ids = null;
 $search_endpoint = '';
