@@ -74,12 +74,11 @@ if ($is_list_all) {
 $output_file = null;
 $wip_output_file = null;
 
-if (isset($_GET['variations'])) {
-  $hasVariations = $_GET['variations']
+if (isset($_GET['skip_variations'])) {
+  $is_skip_variations = true;
 }
-
 if (isset($_GET['discount'])) {
-  $discount = $_GET['discount']
+  $discount = (float)$_GET['discount'];
 }
 
 if ($is_list_all) {
