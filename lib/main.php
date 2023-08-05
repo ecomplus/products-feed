@@ -56,7 +56,7 @@ class ProductsFeed {
     return $result;
   }
 
-  function xml ($title, $query_string, $set_properties, $product_ids, $search_endpoint, $offset = 0, $is_list_all, $output_file, $hasVariations = true, $discount = 0) {
+  function xml ($title, $query_string, $set_properties, $product_ids, $search_endpoint, $offset = 0, $is_list_all, $output_file, $is_skip_variations = false, $discount = 0) {
     if (!$title || trim($title) === '') {
       $title = 'Products feed #' . $this->store_id;
     }
