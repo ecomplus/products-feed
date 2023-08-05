@@ -51,8 +51,6 @@ if (isset($_GET['base_path'])) {
 
 $is_list_all = @$_SERVER['HTTP_X_PRODUCTS_FEED'] === 'ALL';
 $offset = 0;
-$is_skip_variations = false;
-$discount = 0;
 $product_ids = null;
 $search_endpoint = '';
 if ($is_list_all) {
@@ -70,16 +68,13 @@ if ($is_list_all) {
     }
   }
 }
+$is_skip_variations = isset($_GET['skip_variations']);
+$discount = isset($_GET['discount']) && (float)$_GET['discount'] > 0
+  ? (float)$_GET['discount']
+  : 0;
 
 $output_file = null;
 $wip_output_file = null;
-
-if (isset($_GET['skip_variations'])) {
-  $is_skip_variations = true;
-}
-if (isset($_GET['discount'])) {
-  $discount = (float)$_GET['discount'];
-}
 
 if ($is_list_all) {
   $output_file = "/tmp/products-feed-$store_id.xml";

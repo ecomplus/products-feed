@@ -121,7 +121,7 @@ XML;
           if (@$product['available'] === true && @$product['visible'] === true) {
             // convert product to GMC XML entry
             $item_xml = <<<XML
-  {$this->convert($product, $query_string, $set_properties)}
+  {$this->convert($product, $query_string, $set_properties, $is_skip_variations, $discount)}
 XML;
             $concat_xml($item_xml);
           }
@@ -145,7 +145,7 @@ XML;
     return $concat_xml("\n</feed>", true);
   }
 
-  function convert ($body, $query_string, $set_properties, $group_id = null) {
+  function convert ($body, $query_string, $set_properties, $is_skip_variations = false, $discount = 0, $group_id = null) {
     if (isset($body['name']) && isset($body['_id'])) {
       // start converting product body to XML
       // https://support.google.com/merchants/answer/7052112?hl=en
@@ -500,7 +500,7 @@ XML;
             }
           }
 
-          $xml .= $this->convert($variation, $query_string, $set_properties, $entry['id']);
+          $xml .= $this->convert($variation, $query_string, $set_properties, $is_skip_variations, $discount, $entry['id']);
         }
       }
 
