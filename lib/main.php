@@ -56,7 +56,7 @@ class ProductsFeed {
     return $result;
   }
 
-  function xml ($title, $query_string, $set_properties, $product_ids, $search_endpoint, $offset = 0, $is_list_all, $output_file) {
+  function xml ($title, $query_string, $set_properties, $product_ids, $search_endpoint, $offset = 0, $is_list_all, $output_file, $is_skip_variations = false, $discount = 0) {
     if (!$title || trim($title) === '') {
       $title = 'Products feed #' . $this->store_id;
     }
@@ -186,6 +186,10 @@ XML;
           $entry['link'] .= ($query_string ? '&' : '?');
           $entry['link'] .= 'variation_id=' . $body['_id'];
         }
+        if ($discount > 0) {
+          $entry['link'] .= ($query_string ? '&' : '?');
+          $entry['link'] .= 'discount=' . $discount;
+        }
       } else {
         $entry['link'] = $this->base_uri . $query_string . '&_id=' . $body['_id'];
       }
@@ -248,7 +252,7 @@ XML;
         if (isset($body['base_price']) && $body['base_price'] > $body['price']) {
           // promotional price
           $entry['price'] = $body['base_price'] . ' ' . @$body['currency_id'];
-          $entry['sale_price'] = $body['price'] . ' ' . @$body['currency_id'];
+          $entry['sale_price'] = number_format($body['price'] * (1 - $discount), 2, '.', "") . ' ' . @$body['currency_id'];
 
           if (isset($body['price_effective_date'])) {
             $sale_start = @$body['price_effective_date']['start'];
@@ -270,7 +274,7 @@ XML;
           }
         } else {
           // eg.: 10.00 BRL
-          $entry['price'] = $body['price'] . ' ' . @$body['currency_id'];
+          $entry['price'] = number_format($body['price'] * (1 - $discount), 2, '.', "") . ' ' . @$body['currency_id'];
         }
       }
 
@@ -466,7 +470,7 @@ XML;
       $xml .= '</entry>';
 
       // handle product variations recursively
-      if (isset($body['variations'])) {
+      if (isset($body['variations']) && !$is_skip_variations) {
         foreach ($body['variations'] as $variation) {
           // use default values from product body
           if (isset($body['specifications']) && $variation['specifications']) {
