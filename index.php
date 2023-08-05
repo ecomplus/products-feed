@@ -132,7 +132,7 @@ $xml = $products_feed->xml(
   $offset,
   $is_list_all,
   $wip_output_file,
-  $hasVariations,
+  $is_skip_variations,
   $discount
 );
 
