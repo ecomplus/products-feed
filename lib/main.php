@@ -56,7 +56,7 @@ class ProductsFeed {
     return $result;
   }
 
-  function xml ($title, $query_string, $set_properties, $product_ids, $search_endpoint, $offset = 0, $is_list_all, $output_file, $is_skip_variations = false, $discount = 0, $has_variant_description = false) {
+  function xml ($title, $query_string, $set_properties, $product_ids, $search_endpoint, $offset = 0, $is_list_all, $output_file, $is_skip_variations = false, $discount = 0) {
     if (!$title || trim($title) === '') {
       $title = 'Products feed #' . $this->store_id;
     }
@@ -121,7 +121,7 @@ XML;
           if (@$product['available'] === true && @$product['visible'] === true) {
             // convert product to GMC XML entry
             $item_xml = <<<XML
-  {$this->convert($product, $query_string, $set_properties, $is_skip_variations, $discount, $has_variant_description)}
+  {$this->convert($product, $query_string, $set_properties, $is_skip_variations, $discount)}
 XML;
             $concat_xml($item_xml);
           }
@@ -145,7 +145,7 @@ XML;
     return $concat_xml("\n</feed>", true);
   }
 
-  function convert ($body, $query_string, $set_properties, $is_skip_variations = false, $discount = 0, $group_id = null, $has_variant_description = false) {
+  function convert ($body, $query_string, $set_properties, $is_skip_variations = false, $discount = 0, $group_id = null) {
     if (isset($body['name']) && isset($body['_id'])) {
       // start converting product body to XML
       // https://support.google.com/merchants/answer/7052112?hl=en
@@ -482,11 +482,7 @@ XML;
           if (!isset($variation['sku']) && isset($body['sku'])) {
             $variation['sku'] = $body['sku'] . '-' . rand(100, 999);
           }
-          if (!isset($variation['description']) && isset($body['body_html']) && $has_variant_description) {
-            $body_text_variation = str_replace('&nbsp;', ' ', preg_replace('#<[^>]+>#', ' ', $body['body_html']));
-            $variation['description'] = utf8_sanitize($body_text_variation);
-          }
-          $variation = array_merge($body, $variation);
+          $variation = (object) array_merge((array) $body, (array) $variation);
           unset($variation['variations']);
 
           // get the variation specific picture
