@@ -56,7 +56,7 @@ class ProductsFeed {
     return $result;
   }
 
-  function xml ($title, $query_string, $set_properties, $product_ids, $search_endpoint, $offset = 0, $is_list_all, $output_file, $is_skip_variations = false, $discount = 0) {
+  function xml ($title, $query_string, $set_properties, $product_ids, $search_endpoint, $offset = 0, $is_list_all, $output_file, $is_skip_variations = false, $discount = 0, $utm) {
     if (!$title || trim($title) === '') {
       $title = 'Products feed #' . $this->store_id;
     }
@@ -121,7 +121,7 @@ XML;
           if (@$product['available'] === true && @$product['visible'] === true) {
             // convert product to GMC XML entry
             $item_xml = <<<XML
-  {$this->convert($product, $query_string, $set_properties, $is_skip_variations, $discount)}
+  {$this->convert($product, $query_string, $set_properties, $is_skip_variations, $discount, $utm)}
 XML;
             $concat_xml($item_xml);
           }
@@ -145,7 +145,7 @@ XML;
     return $concat_xml("\n</feed>", true);
   }
 
-  function convert ($body, $query_string, $set_properties, $is_skip_variations = false, $discount = 0, $group_id = null) {
+  function convert ($body, $query_string, $set_properties, $is_skip_variations = false, $discount = 0, $utm, $group_id = null) {
     if (isset($body['name']) && isset($body['_id'])) {
       // start converting product body to XML
       // https://support.google.com/merchants/answer/7052112?hl=en
@@ -185,6 +185,10 @@ XML;
         if ($group_id) {
           $entry['link'] .= ($query_string ? '&' : '?');
           $entry['link'] .= 'variation_id=' . $body['_id'];
+        }
+        if ($utm) {
+          $entry['link'] .= ($query_string ? '&' : '?');
+          $entry['link'] .= 'campaign_utm=' . $utm;
         }
         if ($discount > 0) {
           $entry['link'] .= ($query_string ? '&' : '?');
@@ -500,7 +504,7 @@ XML;
             }
           }
 
-          $xml .= $this->convert($variation, $query_string, $set_properties, $is_skip_variations, $discount, $entry['id']);
+          $xml .= $this->convert($variation, $query_string, $set_properties, $is_skip_variations, $discount, $utm, $entry['id']);
         }
       }
 
