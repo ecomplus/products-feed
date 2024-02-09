@@ -149,9 +149,11 @@ XML;
     if (isset($body['name']) && isset($body['_id'])) {
       // start converting product body to XML
       // https://support.google.com/merchants/answer/7052112?hl=en
-      if ($query_string) {
+      if (!$query_string) {
         // fix http query string
         $query_string = '?_=feed';
+      } else if ($query_string[0] !== '?') {
+        $query_string = '?' . $query_string;
       }
 
       $entry = array(
@@ -183,12 +185,10 @@ XML;
       } else if (isset($body['slug'])) {
         $entry['link'] = $this->base_uri . $body['slug'] . $query_string;
         if ($group_id) {
-          $entry['link'] .= ($query_string ? '&' : '?');
-          $entry['link'] .= 'variation_id=' . $body['_id'];
+          $entry['link'] .= '&variation_id=' . $body['_id'];
         }
         if ($discount > 0) {
-          $entry['link'] .= ($query_string ? '&' : '?');
-          $entry['link'] .= 'discount=' . $discount;
+          $entry['link'] .= '&discount=' . $discount;
         }
       } else {
         $entry['link'] = $this->base_uri . $query_string . '&_id=' . $body['_id'];
