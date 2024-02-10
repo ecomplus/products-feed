@@ -168,8 +168,9 @@ XML;
       if (isset($body['body_text'])) {
         $entry['description'] = $body['body_text'];
       } else if (isset($body['body_html'])) {
-        $body_text = str_replace('&nbsp;', ' ', preg_replace('#<[^>]+>#', ' ', $body['body_html']));
-        $body_text = preg_replace('/<style\b[^>]*>.*?<\/style>/is', '', $body_text);
+        $body_text = preg_replace('/<style\b[^>]*>.*?<\/style>/is', '', $body['body_html']);
+        $body_text = preg_replace('#<[^>]+>#', ' ', $body_text);
+        $body_text = str_replace('&nbsp;', ' ', $body_text);
         $entry['description'] = utf8_sanitize($body_text);
       } else {
         $entry['description'] = @$body['short_description'];
