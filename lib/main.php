@@ -149,10 +149,7 @@ XML;
     if (isset($body['name']) && isset($body['_id'])) {
       // start converting product body to XML
       // https://support.google.com/merchants/answer/7052112?hl=en
-      if (!$query_string) {
-        // fix http query string
-        $query_string = '?_=feed';
-      } else if ($query_string[0] !== '?') {
+      if ($query_string[0] !== '?') {
         $query_string = '?' . $query_string;
       }
 
@@ -169,6 +166,7 @@ XML;
         $entry['description'] = $body['body_text'];
       } else if (isset($body['body_html'])) {
         $body_text = str_replace('&nbsp;', ' ', preg_replace('#<[^>]+>#', ' ', $body['body_html']));
+        $body_text = preg_replace('/<style\b[^>]*>.*?<\/style>/is', '', $body_text);
         $entry['description'] = utf8_sanitize($body_text);
       } else {
         $entry['description'] = @$body['short_description'];
