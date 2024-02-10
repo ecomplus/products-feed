@@ -149,8 +149,9 @@ XML;
     if (isset($body['name']) && isset($body['_id'])) {
       // start converting product body to XML
       // https://support.google.com/merchants/answer/7052112?hl=en
-      if ($query_string[0] !== '?') {
-        $query_string = '?' . $query_string;
+      if ($query_string) {
+        // fix http query string
+        $query_string = '?_=feed';
       }
 
       $entry = array(
