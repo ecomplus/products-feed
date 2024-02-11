@@ -146,6 +146,8 @@ XML;
   }
 
   function convert ($body, $query_string, $set_properties, $is_skip_variations = false, $discount = 0, $group_id = null) {
+    $user_agent = @$_SERVER['HTTP_USER_AGENT'] || '';
+    $is_facebook = strpos($user_agent, 'facebook') !== false;
     if (isset($body['name']) && isset($body['_id'])) {
       // start converting product body to XML
       // https://support.google.com/merchants/answer/7052112?hl=en
@@ -335,7 +337,7 @@ XML;
       if (isset($body['weight'])) {
         $entry['shipping_weight'] = @$body['weight']['value'] . ' ' . @$body['weight']['unit'];
       }
-      if (isset($body['dimensions'])) {
+      if (isset($body['dimensions']) && !$is_facebook) {
         $dimensions = array('length', 'width', 'height');
         for ($i = 0; $i < count($dimensions); $i++) {
           $key = $dimensions[$i];
