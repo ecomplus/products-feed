@@ -120,7 +120,7 @@ $products_feed = new ProductsFeed(
 
 $xml = $products_feed->xml(
   !$is_list_all ? @$_GET['title'] : null,
-  !$is_list_all ? (@$_GET['query_string'] || @$_GET['qs']) : null,
+  !$is_list_all ? @$_GET['qs'] : null,
   !$is_list_all && isset($_GET['set_properties']) ? json_decode($_GET['set_properties'], true) : null,
   $product_ids,
   $search_endpoint,

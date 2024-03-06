@@ -154,7 +154,7 @@ XML;
       if (!$query_string) {
         // fix http query string
         $query_string = '?_=feed';
-      } else if ($query_string[0] !== '?') {
+      } else if (mb_substr($query_string, 0, 1) !== '?') {
         $query_string = '?' . $query_string;
       }
 
