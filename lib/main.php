@@ -153,18 +153,9 @@ XML;
       // https://support.google.com/merchants/answer/7052112?hl=en
       if (!$query_string) {
         // fix http query string
-        $query_string = [
-          "_" => "feed",
-        ];
-      }
-
-      function buildQuery ($url, $query_string) {
-        // Check if there are parameters to add
-        if (is_array($query_string)) {
-          $url .= '?' . http_build_query($query_string, '', '&amp;');
-          
-        }
-        return $url;
+        $query_string = '?_=feed';
+      } else if ($query_string[0] !== '?') {
+        $query_string = '?' . $query_string;
       }
 
       $entry = array(
@@ -192,12 +183,11 @@ XML;
 
       // product page links
       if (isset($body['permalink'])) {
-        $entry['link'] = buildQuery($body['permalink'], $query_string);
+        $entry['link'] = $body['permalink'] . $query_string;
       } else if (strpos($this->base_uri, '{{_id}}')) {
         $entry['link'] = str_replace('{{_id}}', $body['_id'], $this->base_uri);
       } else if (isset($body['slug'])) {
-        $entry['link'] = $this->base_uri . $body['slug'];
-        $entry['link'] = buildQuery($entry['link'], $query_string);
+        $entry['link'] = $this->base_uri . $body['slug'] . $query_string;
         if ($group_id) {
           $entry['link'] .= '&amp;variation_id=' . $body['_id'];
         }

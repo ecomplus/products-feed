@@ -18,12 +18,6 @@ https://storefront.e-com.plus/products-feed.xml?store_id={storeId}&domain={domai
 
 ### Additional examples
 
-> Set query string
-
-```
-https://storefront.e-com.plus/products-feed.xml?store_id={storeId}&domain={domain}&qs={"utm_campaign":"facebook_ads"}
-```
-
 > Forcing `google_product_category_id`
 
 ```
