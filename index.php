@@ -7,8 +7,11 @@ try {
   error_log("Caught $e");
 }
 
-function search_products ($field, $value, $store_id) {
-  $endpoint = 'https://apx-search.e-com.plus/api/v1/items.json?size=500&q=' . $field . ':"' . $value . '"';
+function search_products ($field, $value, $store_id, $api_host = null) {
+  if (!$api_host) {
+    $api_host = 'https://apx-search.e-com.plus/api/v1';
+  }
+  $endpoint = $$api_host . '/items.json?size=500&q=' . $field . ':"' . $value . '"';
 
   $curl = curl_init();
   curl_setopt($curl, CURLOPT_URL, $endpoint);
@@ -50,6 +53,7 @@ if (isset($_GET['base_path'])) {
 }
 
 $is_list_all = @$_SERVER['HTTP_X_PRODUCTS_FEED'] === 'ALL';
+$is_api_v2 = @$_GET['api_v'] === '2';
 $offset = 0;
 $product_ids = null;
 $search_endpoint = '';
@@ -60,7 +64,8 @@ if ($is_list_all) {
   $product_ids = isset($_GET['product_ids']) ? json_decode($_GET['product_ids'], true) : null;
   if (!$product_ids) {
     if (isset($_GET['search_field']) && isset($_GET['search_value'])) {
-      $search_result = search_products($_GET['search_field'], $_GET['search_value'], $store_id);
+      $api_host = $is_api_v2 ? 'https://ecomplus.io/v2/search/_els' : null;
+      $search_result = search_products($_GET['search_field'], $_GET['search_value'], $store_id, $api_host);
       $product_ids = $search_result['ids'];
       $search_endpoint = $search_result['endpoint'];
     } else if (isset($_GET['offset']) && (int)$_GET['offset'] > 0) {
@@ -115,7 +120,8 @@ if ($is_list_all) {
 $products_feed = new ProductsFeed(
   $store_id,
   !$output_file ? $base_uri : '{{base_uri}}',
-  @$_SERVER['HTTP_X_STORE_API_HOST']
+  @$_SERVER['HTTP_X_STORE_API_HOST'],
+  $is_api_v2 ? "https://ecomplus.io/:$store_id/v2" : null
 );
 
 $xml = $products_feed->xml(

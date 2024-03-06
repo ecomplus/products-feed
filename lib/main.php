@@ -40,7 +40,7 @@ class ProductsFeed {
     curl_setopt($curl, CURLOPT_URL, $this->api_host . $endpoint);
     curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
     curl_setopt($curl, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
-    if (strpos($this->api_host, '/' . $this->store_id . '/') === false) {
+    if (strpos($this->api_host, $this->store_id . '/') === false) {
       curl_setopt($curl, CURLOPT_HTTPHEADER, array(
         'X-Store-ID: ' . $this->store_id,
         'Content-Type: application/json',
