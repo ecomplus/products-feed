@@ -255,7 +255,7 @@ XML;
       if (isset($body['price'])) {
         if (isset($body['base_price']) && $body['base_price'] > $body['price']) {
           // promotional price
-          $entry['price'] = $body['base_price'] . ' ' . @$body['currency_id'];
+          $entry['price'] = number_format($body['base_price'] * (1 - $discount), 2, '.', "") . ' ' . @$body['currency_id'];
           $entry['sale_price'] = number_format($body['price'] * (1 - $discount), 2, '.', "") . ' ' . @$body['currency_id'];
 
           if (isset($body['price_effective_date'])) {
@@ -275,6 +275,11 @@ XML;
                 $entry['sale_price_effective_date'] = $sale_start . '/' . $sale_end;
               }
             }
+          }
+          if ($discount > 0 && isset($entry['sale_price'])) {
+            $entry['price'] = $entry['sale_price'];
+            unset($entry['sale_price']);
+            unset($entry['sale_price_effective_date']);
           }
         } else {
           // eg.: 10.00 BRL
