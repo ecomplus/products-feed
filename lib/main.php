@@ -63,7 +63,7 @@ class ProductsFeed {
     $date = date('Y-m-d\TH:i:s\Z');
     $rand = rand(10000, 99999);
 
-    if (!$product_ids) {
+    if (!is_array($product_ids)) {
       // get all products
       $json = $this->api_request('/products.json');
       $product_ids = [];
