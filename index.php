@@ -11,7 +11,7 @@ function search_products ($field, $value, $store_id, $api_host = null) {
   if (!$api_host) {
     $api_host = 'https://apx-search.e-com.plus/api/v1';
   }
-  $endpoint = $$api_host . '/items.json?size=500&q=' . $field . ':"' . $value . '"';
+  $endpoint = $api_host . '/items.json?size=500&q=' . $field . ':"' . $value . '"';
 
   $curl = curl_init();
   curl_setopt($curl, CURLOPT_URL, $endpoint);
