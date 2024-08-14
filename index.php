@@ -8,12 +8,33 @@ try {
 }
 
 function search_products ($field, $value, $store_id, $api_host = null) {
+  $curl = curl_init();
   if (!$api_host) {
     $api_host = 'https://apx-search.e-com.plus/api/v1';
   }
-  $endpoint = $api_host . '/items.json?size=500&q=' . $field . ':"' . $value . '"';
-
-  $curl = curl_init();
+  if ($value && $field && str_contains($field, 'specs.')) {
+    curl_setopt($curl, CURLOPT_POST, 1);
+    curl_setopt($curl, CURLOPT_POSTFIELDS, json_encode(array(
+      "query" => array(
+        "bool" => array(
+          "filter" => array(array(
+            "nested" => array(
+              "path" => "specs",
+              "query" => array(
+                "terms" => array(
+                  $field => array($value),
+                ),
+              ),
+            ),
+          )),
+        ),
+      ),
+      "size" => 500,
+    )));
+    $endpoint = $api_host . '/items.json';
+  } else {
+    $endpoint = $api_host . '/items.json?size=500&q=' . $field . ':"' . $value . '"';
+  }
   curl_setopt($curl, CURLOPT_URL, $endpoint);
   curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
   curl_setopt($curl, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
