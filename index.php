@@ -7,12 +7,12 @@ try {
   error_log("Caught $e");
 }
 
-function search_products ($field, $value, $store_id, $api_host = null) {
+function search_products ($field, $value, $store_id, $api_host = null, $offset = 0) {
   $curl = curl_init();
   if (!$api_host) {
     $api_host = 'https://apx-search.e-com.plus/api/v1';
   }
-  if ($value && $field && str_contains($field, 'specs.')) {
+  if ($value && $field && strpos($field, 'specs.') !== false) {
     curl_setopt($curl, CURLOPT_POST, 1);
     curl_setopt($curl, CURLOPT_POSTFIELDS, json_encode(array(
       "query" => array(
@@ -30,10 +30,11 @@ function search_products ($field, $value, $store_id, $api_host = null) {
         ),
       ),
       "size" => 500,
+      "from" => $offset
     )));
     $endpoint = $api_host . '/items.json';
   } else {
-    $endpoint = $api_host . '/items.json?size=500&q=' . $field . ':"' . $value . '"';
+    $endpoint = $api_host . '/items.json?size=500&from=' . $offset . '&q=' . $field . ':"' . $value . '"';
   }
   curl_setopt($curl, CURLOPT_URL, $endpoint);
   curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
@@ -84,13 +85,20 @@ if ($is_list_all) {
 } else {
   $product_ids = isset($_GET['product_ids']) ? json_decode($_GET['product_ids'], true) : null;
   if (!$product_ids) {
+    if (isset($_GET['offset']) && (int)$_GET['offset'] > 0) {
+      $offset = (int)$_GET['offset'];
+    }
     if (isset($_GET['search_field']) && isset($_GET['search_value'])) {
       $api_host = $is_api_v2 ? 'https://ecomplus.io/v2/search/_els' : null;
-      $search_result = search_products($_GET['search_field'], $_GET['search_value'], $store_id, $api_host);
+      $search_result = search_products(
+        $_GET['search_field'],
+        $_GET['search_value'],
+        $store_id,
+        $api_host,
+        $offset
+      );
       $product_ids = $search_result['ids'];
       $search_endpoint = $search_result['endpoint'];
-    } else if (isset($_GET['offset']) && (int)$_GET['offset'] > 0) {
-      $offset = (int)$_GET['offset'];
     }
   }
 }
