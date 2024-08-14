@@ -30,7 +30,7 @@ function search_products ($field, $value, $store_id, $api_host = null, $offset =
         ),
       ),
       "size" => 500,
-      "from" => $offset
+      "from" => $offset,
     )));
     $endpoint = $api_host . '/items.json';
   } else {
@@ -97,6 +97,7 @@ if ($is_list_all) {
         $api_host,
         $offset
       );
+      $offset = 0;
       $product_ids = $search_result['ids'];
       $search_endpoint = $search_result['endpoint'];
     }
