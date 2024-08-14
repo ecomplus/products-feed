@@ -9,7 +9,7 @@ https://storefront.e-com.plus/products-feed.xml?store_id={storeId}&domain={domai
 ### Optional URL params
 
 - `title`
-- `query_string`
+- `qs`
 - `set_properties` (JSON object)
 - `product_ids` (JSON array)
 - `offset`
