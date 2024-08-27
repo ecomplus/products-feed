@@ -269,7 +269,10 @@ XML;
                 // any future date
                 $sale_end = date('Y-m-d\TH:i:s\Z', strtotime('+60 days'));
               }
-              if ($sale_start > $sale_end) {
+              $now = strtotime(date('c'));
+              $start_time = strtotime($sale_start);
+              $end_time = strtotime($sale_end);
+              if ($sale_start > $sale_end || $sale_start > $now || $now > $end_time) {
                 unset($entry['sale_price']);
               } else {
                 $entry['sale_price_effective_date'] = $sale_start . '/' . $sale_end;
