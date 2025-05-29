@@ -32,8 +32,13 @@ function search_products ($field, $value, $store_id, $api_host = null, $offset =
       "size" => 500,
       "from" => $offset,
     )));
+    curl_setopt($curl, CURLOPT_HTTPHEADER, array(
+      'X-Store-ID: ' . $store_id,
+      'Content-Type: application/json',
+    ));
     $endpoint = $api_host . '/items.json';
   } else {
+    curl_setopt($curl, CURLOPT_HTTPHEADER, array('X-Store-ID: ' . $store_id));
     $endpoint = $api_host . '/items.json?size=500&from=' . $offset . '&q=' . $field . ':"' . $value . '"';
   }
   curl_setopt($curl, CURLOPT_URL, $endpoint);
@@ -44,10 +49,6 @@ function search_products ($field, $value, $store_id, $api_host = null, $offset =
   curl_setopt($curl, CURLOPT_FOLLOWLOCATION, true);
   curl_setopt($curl, CURLOPT_FAILONERROR, false);
   curl_setopt($curl, CURLOPT_HTTP200ALIASES, array(400));
-  curl_setopt($curl, CURLOPT_HTTPHEADER, array(
-    'X-Store-ID: ' . $store_id,
-    'Content-Type: application/json',
-  ));
   $json = curl_exec($curl);
   $http_code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
   $curl_error = curl_error($curl);
