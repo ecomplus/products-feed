@@ -38,7 +38,8 @@ function search_products ($field, $value, $store_id, $api_host = null, $offset =
   }
   curl_setopt($curl, CURLOPT_URL, $endpoint);
   curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
-  curl_setopt($curl, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
+  curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
+  curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
   curl_setopt($curl, CURLOPT_HTTPHEADER, array(
     'X-Store-ID: ' . $store_id,
     'Content-Type: application/json',
@@ -57,7 +58,7 @@ function search_products ($field, $value, $store_id, $api_host = null, $offset =
   return array(
     'endpoint' => $endpoint,
     'ids' => $product_ids,
-    'json' => $json
+    'response' => $json || curl_getinfo($ch , CURLINFO_HTTP_CODE)
   );
 }
 
@@ -80,7 +81,7 @@ $is_api_v2 = @$_GET['api_v'] === '2';
 $offset = 0;
 $product_ids = null;
 $search_endpoint = '';
-$search_json = '';
+$search_respose = '';
 if ($is_list_all) {
   ignore_user_abort(true);
   set_time_limit(1680);
@@ -102,7 +103,7 @@ if ($is_list_all) {
       $offset = 0;
       $product_ids = $search_result['ids'];
       $search_endpoint = $search_result['endpoint'];
-      $search_json = $search_result['json'];
+      $search_respose = $search_result['response'];
     }
   }
 }
@@ -180,7 +181,7 @@ if (!$output_file) {
     }
   } else {
     http_response_code(501);
-    echo "empty xml \n\n" . $search_endpoint . " \n" . (isset($product_ids) ? count($product_ids) : '_') . " \n\n" . $search_json;
+    echo "empty xml \n\n" . $search_endpoint . " \n" . (isset($product_ids) ? count($product_ids) : '_') . " \n\n" . $search_respose;
   }
 } else if ($xml) {
   rename($wip_output_file, $output_file);
