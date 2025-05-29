@@ -177,7 +177,7 @@ if (!$output_file) {
     }
   } else {
     http_response_code(501);
-    echo "empty xml (" . (isset($product_ids) ? count($product_ids) : '_') .  ")";
+    echo "empty xml \n\n" . $search_endpoint . " \n" . (isset($product_ids) ? count($product_ids) : '_');
   }
 } else if ($xml) {
   rename($wip_output_file, $output_file);
