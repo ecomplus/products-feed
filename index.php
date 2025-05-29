@@ -58,7 +58,7 @@ function search_products ($field, $value, $store_id, $api_host = null, $offset =
   return array(
     'endpoint' => $endpoint,
     'ids' => $product_ids,
-    'response' => $json || curl_getinfo($ch , CURLINFO_HTTP_CODE)
+    'response' => $json || curl_getinfo($ch, CURLINFO_HTTP_CODE)
   );
 }
 
@@ -103,7 +103,7 @@ if ($is_list_all) {
       $offset = 0;
       $product_ids = $search_result['ids'];
       $search_endpoint = $search_result['endpoint'];
-      $search_respose = $search_result['response'];
+      $search_respose = $search_result['response'] || '_';
     }
   }
 }
