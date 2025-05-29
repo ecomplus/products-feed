@@ -42,6 +42,7 @@ function search_products ($field, $value, $store_id, $api_host = null, $offset =
   curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, 0);
   curl_setopt($curl, CURLOPT_TIMEOUT, 30);
   curl_setopt($curl, CURLOPT_FOLLOWLOCATION, true);
+  curl_setopt($curl, CURLOPT_FAILONERROR, false);
   curl_setopt($curl, CURLOPT_HTTP200ALIASES, array(400));
   curl_setopt($curl, CURLOPT_HTTPHEADER, array(
     'X-Store-ID: ' . $store_id,
@@ -55,7 +56,7 @@ function search_products ($field, $value, $store_id, $api_host = null, $offset =
   } elseif ($curl_error) {
     $response = "CURL Error: " . $curl_error;
   } else {
-    $response = "HTTP " . $http_code;
+    $response = "HTTP: " . $http_code;
   }
   curl_close($curl);
 
