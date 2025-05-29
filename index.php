@@ -58,7 +58,7 @@ function search_products ($field, $value, $store_id, $api_host = null, $offset =
   return array(
     'endpoint' => $endpoint,
     'ids' => $product_ids,
-    'response' => $json || curl_getinfo($ch, CURLINFO_HTTP_CODE)
+    'response' => $json
   );
 }
 
