@@ -42,7 +42,7 @@ function search_products ($field, $value, $store_id, $api_host = null, $offset =
   curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, 0);
   curl_setopt($curl, CURLOPT_TIMEOUT, 30);
   curl_setopt($curl, CURLOPT_FOLLOWLOCATION, true);
-  curl_setopt($curl, CURLOPT_FAILONERROR, false);
+  curl_setopt($curl, CURLOPT_HTTP200ALIASES, array(400));
   curl_setopt($curl, CURLOPT_HTTPHEADER, array(
     'X-Store-ID: ' . $store_id,
     'Content-Type: application/json',
