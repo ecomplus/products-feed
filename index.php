@@ -96,7 +96,6 @@ $is_api_v2 = @$_GET['api_v'] === '2';
 $offset = 0;
 $product_ids = null;
 $search_endpoint = '';
-$search_respose = '';
 if ($is_list_all) {
   ignore_user_abort(true);
   set_time_limit(1680);
@@ -118,7 +117,6 @@ if ($is_list_all) {
       $offset = 0;
       $product_ids = $search_result['ids'];
       $search_endpoint = $search_result['endpoint'];
-      $search_respose = $search_result['response'];
     }
   }
 }
@@ -196,7 +194,7 @@ if (!$output_file) {
     }
   } else {
     http_response_code(501);
-    echo "empty xml \n\n" . $search_endpoint . " \n" . (isset($product_ids) ? count($product_ids) : '_') . " \n\n" . $search_respose;
+    echo "empty xml \n\n" . $search_endpoint . " \n" . (isset($product_ids) ? count($product_ids) : '_');
   }
 } else if ($xml) {
   rename($wip_output_file, $output_file);
