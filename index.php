@@ -56,7 +56,8 @@ function search_products ($field, $value, $store_id, $api_host = null, $offset =
   }
   return array(
     'endpoint' => $endpoint,
-    'ids' => $product_ids
+    'ids' => $product_ids,
+    'json' => $json
   );
 }
 
@@ -79,6 +80,7 @@ $is_api_v2 = @$_GET['api_v'] === '2';
 $offset = 0;
 $product_ids = null;
 $search_endpoint = '';
+$search_json = '';
 if ($is_list_all) {
   ignore_user_abort(true);
   set_time_limit(1680);
@@ -100,6 +102,7 @@ if ($is_list_all) {
       $offset = 0;
       $product_ids = $search_result['ids'];
       $search_endpoint = $search_result['endpoint'];
+      $search_json = $search_result['json'];
     }
   }
 }
@@ -177,7 +180,7 @@ if (!$output_file) {
     }
   } else {
     http_response_code(501);
-    echo "empty xml \n\n" . $search_endpoint . " \n" . (isset($product_ids) ? count($product_ids) : '_');
+    echo "empty xml \n\n" . $search_endpoint . " \n" . (isset($product_ids) ? count($product_ids) : '_') . " \n\n" . $search_json;
   }
 } else if ($xml) {
   rename($wip_output_file, $output_file);
