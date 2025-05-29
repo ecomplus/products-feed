@@ -52,10 +52,6 @@ function search_products ($field, $value, $store_id, $api_host = null, $offset =
   $json = curl_exec($curl);
   $http_code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
   $curl_error = curl_error($curl);
-  $response = "Raw response length: " . strlen($json) . 
-    "\nHTTP Code: " . $http_code . 
-    "\nCURL Error: " . $curl_error . 
-    "\nContent: " . $json;
   curl_close($curl);
 
   $product_ids = [];
@@ -69,7 +65,10 @@ function search_products ($field, $value, $store_id, $api_host = null, $offset =
   return array(
     'endpoint' => $endpoint,
     'ids' => $product_ids,
-    'response' => $response
+    'response' => "Raw response length: " . strlen($json) . 
+      "\nHTTP Code: " . $http_code . 
+      "\nCURL Error: " . $curl_error . 
+      "\nContent: " . $json
   );
 }
 
