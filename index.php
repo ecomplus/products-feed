@@ -38,13 +38,17 @@ function search_products ($field, $value, $store_id, $api_host = null, $offset =
   }
   curl_setopt($curl, CURLOPT_URL, $endpoint);
   curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
-  curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
-  curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
+  curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, 0);
+  curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, 0);
+  curl_setopt($curl, CURLOPT_TIMEOUT, 30);
+  curl_setopt($curl, CURLOPT_FOLLOWLOCATION, true);
   curl_setopt($curl, CURLOPT_HTTPHEADER, array(
     'X-Store-ID: ' . $store_id,
     'Content-Type: application/json',
   ));
   $json = curl_exec($curl);
+  $http_code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+  $curl_error = curl_error($curl);
   curl_close($curl);
 
   $product_ids = [];
@@ -58,7 +62,7 @@ function search_products ($field, $value, $store_id, $api_host = null, $offset =
   return array(
     'endpoint' => $endpoint,
     'ids' => $product_ids,
-    'response' => $json
+    'response' => $json || $http_code || $curl_error
   );
 }
 
