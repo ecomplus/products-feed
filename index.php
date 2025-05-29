@@ -103,7 +103,7 @@ if ($is_list_all) {
       $offset = 0;
       $product_ids = $search_result['ids'];
       $search_endpoint = $search_result['endpoint'];
-      $search_respose = $search_result['response'] || '_';
+      $search_respose = $search_result['response'];
     }
   }
 }
