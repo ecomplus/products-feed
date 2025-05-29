@@ -39,7 +39,12 @@ function search_products ($field, $value, $store_id, $api_host = null, $offset =
     $endpoint = $api_host . '/items.json';
   } else {
     curl_setopt($curl, CURLOPT_HTTPHEADER, array('X-Store-ID: ' . $store_id));
-    $endpoint = $api_host . '/items.json?size=500&from=' . $offset . '&q=' . $field . ':"' . $value . '"';
+    $params = array(
+      'size' => 500,
+      'from' => $offset,
+      'q' => $field . ':"' . $value . '"'
+    );
+    $endpoint = $api_host . '/items.json?' . http_build_query($params);
   }
   curl_setopt($curl, CURLOPT_URL, $endpoint);
   curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
