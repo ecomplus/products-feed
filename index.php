@@ -49,6 +49,13 @@ function search_products ($field, $value, $store_id, $api_host = null, $offset =
   $json = curl_exec($curl);
   $http_code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
   $curl_error = curl_error($curl);
+  if ($json) {
+    $response = $json;
+  } elseif ($curl_error) {
+    $response = "CURL Error: " . $curl_error;
+  } else {
+    $response = "HTTP " . $http_code;
+  }
   curl_close($curl);
 
   $product_ids = [];
@@ -62,7 +69,7 @@ function search_products ($field, $value, $store_id, $api_host = null, $offset =
   return array(
     'endpoint' => $endpoint,
     'ids' => $product_ids,
-    'response' => $json || $http_code || $curl_error
+    'response' => $response
   );
 }
 
