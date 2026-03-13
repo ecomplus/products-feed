@@ -121,6 +121,7 @@ if ($is_list_all) {
   }
 }
 $is_skip_variations = isset($_GET['skip_variations']);
+$only_in_stock = isset($_GET['only_in_stock']);
 $discount = isset($_GET['discount']) && (float)$_GET['discount'] > 0
   ? (float)$_GET['discount']
   : 0;
@@ -181,7 +182,8 @@ $xml = $products_feed->xml(
   $is_list_all,
   $wip_output_file,
   $is_skip_variations,
-  $discount
+  $discount,
+  $only_in_stock
 );
 
 if (!$output_file) {
