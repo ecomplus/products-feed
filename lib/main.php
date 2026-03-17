@@ -56,7 +56,7 @@ class ProductsFeed {
     return $result;
   }
 
-  function xml ($title, $query_string, $set_properties, $product_ids, $search_endpoint, $offset = 0, $is_list_all, $output_file, $is_skip_variations = false, $discount = 0) {
+  function xml ($title, $query_string, $set_properties, $product_ids, $search_endpoint, $offset = 0, $is_list_all, $output_file, $is_skip_variations = false, $discount = 0, $only_in_stock = false) {
     if (!$title || trim($title) === '') {
       $title = 'Products feed #' . $this->store_id;
     }
@@ -119,9 +119,31 @@ XML;
         if (@$product['_id']) {
           // check if product is available
           if (@$product['available'] === true && @$product['visible'] === true) {
+            // check only_in_stock filter
+            if ($only_in_stock) {
+              $has_stock = function($b) {
+                return !isset($b['quantity']) || ($b['quantity'] && $b['quantity'] >= @$b['min_quantity']);
+              };
+              if (isset($product['variations']) && count($product['variations']) > 0) {
+                $any_in_stock = false;
+                foreach ($product['variations'] as $variation) {
+                  if ($has_stock(array_merge($product, $variation))) {
+                    $any_in_stock = true;
+                    break;
+                  }
+                }
+                if (!$any_in_stock) {
+                  $is_retry = false;
+                  continue;
+                }
+              } else if (!$has_stock($product)) {
+                $is_retry = false;
+                continue;
+              }
+            }
             // convert product to GMC XML entry
             $item_xml = <<<XML
-  {$this->convert($product, $query_string, $set_properties, $is_skip_variations, $discount)}
+  {$this->convert($product, $query_string, $set_properties, $is_skip_variations, $discount, null, $only_in_stock)}
 XML;
             $concat_xml($item_xml);
           }
@@ -145,7 +167,7 @@ XML;
     return $concat_xml("\n</feed>", true);
   }
 
-  function convert ($body, $query_string, $set_properties, $is_skip_variations = false, $discount = 0, $group_id = null) {
+  function convert ($body, $query_string, $set_properties, $is_skip_variations = false, $discount = 0, $group_id = null, $only_in_stock = false) {
     $user_agent = @$_SERVER['HTTP_USER_AGENT'] || '';
     $is_facebook = strpos($user_agent, 'facebook') !== false;
     if (isset($body['name']) && isset($body['_id'])) {
@@ -497,6 +519,14 @@ XML;
           $variation = array_merge($body, $variation);
           unset($variation['variations']);
 
+          // skip variation if only_in_stock and no quantity available
+          if ($only_in_stock) {
+            $variation_in_stock = !isset($variation['quantity']) || ($variation['quantity'] && $variation['quantity'] >= @$variation['min_quantity']);
+            if (!$variation_in_stock) {
+              continue;
+            }
+          }
+
           // get the variation specific picture
           if (isset($variation['picture_id']) && isset($body['pictures'])) {
             $img_obj = null;
@@ -512,7 +542,7 @@ XML;
             }
           }
 
-          $xml .= $this->convert($variation, $query_string, $set_properties, $is_skip_variations, $discount, $entry['id']);
+          $xml .= $this->convert($variation, $query_string, $set_properties, $is_skip_variations, $discount, $entry['id'], $only_in_stock);
         }
       }
 
