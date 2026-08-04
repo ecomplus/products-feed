@@ -56,6 +56,17 @@ class ProductsFeed {
     return $result;
   }
 
+  private function is_in_stock ($body) {
+    if (@$body['manage_stock'] === false) {
+      // stock is not managed, product is always available to buy
+      return true;
+    }
+    if (!isset($body['quantity'])) {
+      return true;
+    }
+    return $body['quantity'] > 0 && $body['quantity'] >= (int)@$body['min_quantity'];
+  }
+
   function xml ($title, $query_string, $set_properties, $product_ids, $search_endpoint, $offset = 0, $is_list_all, $output_file, $is_skip_variations = false, $discount = 0) {
     if (!$title || trim($title) === '') {
       $title = 'Products feed #' . $this->store_id;
@@ -202,11 +213,7 @@ XML;
       }
 
       // stock
-      if (!isset($body['quantity']) || ($body['quantity'] && $body['quantity'] >= @$body['min_quantity'])) {
-        $entry['availability'] = 'in stock';
-      } else {
-        $entry['availability'] = 'out of stock';
-      }
+      $entry['availability'] = $this->is_in_stock($body) ? 'in stock' : 'out of stock';
 
       // optional production (factory) time
       if (@$body['production_time']['days']) {
