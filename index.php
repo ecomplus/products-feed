@@ -130,7 +130,17 @@ $output_file = null;
 $wip_output_file = null;
 
 if ($is_list_all) {
-  $output_file = "/tmp/products-feed-$store_id.xml";
+  // cache file must change with any option affecting the generated entries,
+  // default (no option) keeps the original filename
+  $variant_key = '';
+  if ($is_skip_variations || $only_in_stock || $discount > 0) {
+    $variant_key = '-' . substr(md5(json_encode(array(
+      'skip_variations' => $is_skip_variations,
+      'only_in_stock' => $only_in_stock,
+      'discount' => $discount,
+    ))), 0, 8);
+  }
+  $output_file = "/tmp/products-feed-$store_id$variant_key.xml";
   $wip_output_file = "$output_file.wip";
   if (file_exists($wip_output_file) && time() - filemtime($wip_output_file) <= 3600) {
     http_response_code(202);

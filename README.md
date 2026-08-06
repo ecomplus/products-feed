@@ -17,7 +17,8 @@ https://storefront.e-com.plus/products-feed.xml?store_id={storeId}&domain={domai
 - `search_value`
 - `base_path` — appended to the store domain to build product URLs (e.g. `/en/`)
 - `skip_variations` — when present, product variations are omitted from the feed
-- `only_in_stock` — when present, only products with available stock are included
+- `only_in_stock` — when present, only products with available stock are included.
+  Products with `manage_stock: false` are always treated as in stock, whatever the quantity
 - `discount` — apply a percentage discount to all prices (e.g. `discount=10` for 10% off)
 - `api_v` — set to `2` to use E-Com Plus API v2 for search requests
 

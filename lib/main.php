@@ -56,6 +56,29 @@ class ProductsFeed {
     return $result;
   }
 
+  private function is_in_stock ($body) {
+    if (@$body['manage_stock'] === false) {
+      // stock is not managed, product is always available to buy
+      return true;
+    }
+    if (!isset($body['quantity'])) {
+      return true;
+    }
+    return $body['quantity'] > 0 && $body['quantity'] >= (int)@$body['min_quantity'];
+  }
+
+  private function has_any_stock ($product) {
+    if (isset($product['variations']) && count($product['variations']) > 0) {
+      foreach ($product['variations'] as $variation) {
+        if ($this->is_in_stock(array_merge($product, $variation))) {
+          return true;
+        }
+      }
+      return false;
+    }
+    return $this->is_in_stock($product);
+  }
+
   function xml ($title, $query_string, $set_properties, $product_ids, $search_endpoint, $offset = 0, $is_list_all, $output_file, $is_skip_variations = false, $discount = 0, $only_in_stock = false) {
     if (!$title || trim($title) === '') {
       $title = 'Products feed #' . $this->store_id;
@@ -120,26 +143,9 @@ XML;
           // check if product is available
           if (@$product['available'] === true && @$product['visible'] === true) {
             // check only_in_stock filter
-            if ($only_in_stock) {
-              $has_stock = function($b) {
-                return !isset($b['quantity']) || ($b['quantity'] && $b['quantity'] >= @$b['min_quantity']);
-              };
-              if (isset($product['variations']) && count($product['variations']) > 0) {
-                $any_in_stock = false;
-                foreach ($product['variations'] as $variation) {
-                  if ($has_stock(array_merge($product, $variation))) {
-                    $any_in_stock = true;
-                    break;
-                  }
-                }
-                if (!$any_in_stock) {
-                  $is_retry = false;
-                  continue;
-                }
-              } else if (!$has_stock($product)) {
-                $is_retry = false;
-                continue;
-              }
+            if ($only_in_stock && !$this->has_any_stock($product)) {
+              $is_retry = false;
+              continue;
             }
             // convert product to GMC XML entry
             $item_xml = <<<XML
@@ -224,11 +230,8 @@ XML;
       }
 
       // stock
-      if (!isset($body['quantity']) || ($body['quantity'] && $body['quantity'] >= @$body['min_quantity'])) {
-        $entry['availability'] = 'in stock';
-      } else {
-        $entry['availability'] = 'out of stock';
-      }
+      $in_stock = $this->is_in_stock($body);
+      $entry['availability'] = $in_stock ? 'in stock' : 'out of stock';
 
       // optional production (factory) time
       if (@$body['production_time']['days']) {
@@ -489,19 +492,23 @@ XML;
       }
 
       // parse to XML string
-      $xml = "\n<entry>";
-      foreach ($entry as $key => $value) {
-        if (is_array($value)) {
-          foreach ($value as $nested_value) {
-            $xml .= '<g:' . $key . '><![CDATA[' . $nested_value . ']]></g:' . $key . '>';
+      // with only_in_stock, never output an entry marked as out of stock
+      $xml = '';
+      if (!$only_in_stock || $in_stock) {
+        $xml = "\n<entry>";
+        foreach ($entry as $key => $value) {
+          if (is_array($value)) {
+            foreach ($value as $nested_value) {
+              $xml .= '<g:' . $key . '><![CDATA[' . $nested_value . ']]></g:' . $key . '>';
+            }
+          } else if ($key === 'link') {
+            $xml .= '<g:' . $key . '><!--' . $body['_id'] . '-->' . $value . '</g:' . $key . '>';
+          } else {
+            $xml .= '<g:' . $key . '><![CDATA[' . $value . ']]></g:' . $key . '>';
           }
-        } else if ($key === 'link') {
-          $xml .= '<g:' . $key . '><!--' . $body['_id'] . '-->' . $value . '</g:' . $key . '>';
-        } else {
-          $xml .= '<g:' . $key . '><![CDATA[' . $value . ']]></g:' . $key . '>';
         }
+        $xml .= '</entry>';
       }
-      $xml .= '</entry>';
 
       // handle product variations recursively
       if (isset($body['variations']) && !$is_skip_variations) {
@@ -520,11 +527,8 @@ XML;
           unset($variation['variations']);
 
           // skip variation if only_in_stock and no quantity available
-          if ($only_in_stock) {
-            $variation_in_stock = !isset($variation['quantity']) || ($variation['quantity'] && $variation['quantity'] >= @$variation['min_quantity']);
-            if (!$variation_in_stock) {
-              continue;
-            }
+          if ($only_in_stock && !$this->is_in_stock($variation)) {
+            continue;
           }
 
           // get the variation specific picture
